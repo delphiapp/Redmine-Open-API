@@ -1,0 +1,6483 @@
+{
+  "openapi": "3.0.2",
+  "info": {
+    "title": "Redmine API",
+    "description": "Redmine exposes some of its data through a REST API. This API provides \naccess and basic CRUD operations (create, update, delete) for the resources \ndescribed below. The API supports both XML and JSON formats.\n",
+    "version": "3.5"
+  },
+  "externalDocs": {
+    "description": "Redmine Rest API Reference",
+    "url": "http://www.redmine.org/projects/redmine/wiki/Rest_api"
+  },
+  "servers": [
+    {
+      "url": ""
+    }
+  ],
+  "security": [
+    {
+      "api_key": []
+    },
+    {
+      "BasicAuth": []
+    }
+  ],
+  "tags": [
+
+  ],
+  "paths": {
+    "/issues.{format}": {
+      "get": {
+        "tags": [
+          "Issues"
+        ],
+        "summary": "Listing issues",
+        "description": "Returns a paginated list of issues. By default, it returns open issues only.  \nNB: operators containing \">\", \"<\" or \"=\" should be hex-encoded so they're parsed correctly. Most evolved API clients will do that for you by default, but for the sake of clarity the following examples have been written with no such magic feature in mind.\n",
+        "operationId": "IssuesList",              
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/format"
+          },
+          {
+            "$ref": "#/components/parameters/offset_param"
+          },
+          {
+            "$ref": "#/components/parameters/limit_param"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "column to sort with. Append :desc to invert the order.",
+            "schema": {
+              "type": "array",
+              "items":{
+                "type": "string"
+              }
+            },
+            "explode": false
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "required": false,
+            "description": "fetch associated data (optional, use comma to fetch multiple associations). Possible values: ",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["attachments","relations"]
+              }
+            },
+            "explode": false            
+          },          
+          {
+            "name": "issue_id",
+            "in": "query",
+            "description": "get issue with the given id or multiple issues by id using ',' to separate id",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items":{
+                "type": "integer"
+              }
+            },
+            "explode": false
+          },
+          {
+            "name": "project_id",
+            "in": "query",
+            "required": false,
+            "description": "get issues from the project with the given id (a numeric value, not a project identifier).",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "subproject_id",
+            "in": "query",
+            "required": false,
+            "description": "get issues from the subproject with the given id. You can use project_id=XXX&subproject_id=!* to get only the issues of a given project and none of its subprojects.",
+            "schema": {
+              "type": "string",
+              "enum": ["*","!*"],
+              "default":"*"
+            }
+          },
+          {
+            "name": "tracker_id",
+            "in": "query",
+            "required": false,            
+            "description": "get issues from the tracker with the given id",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "query_id",
+            "in": "query",
+            "required": false,            
+            "description": "you can get the corresponding issue list using",
+            "schema": {
+              "type": "integer"
+            }
+          },          
+          {
+            "name": "status_id",
+            "in": "query",
+            "required": false,
+            "description": "get issues with the given status id only. Possible values: open, closed, * to get open and closed issues, status id",
+            "schema": {
+              "oneOf":[
+                {
+                  "type": "string",
+                  "enum": ["open","closed","*"]
+                },
+                {
+                  "type":"integer"
+                }
+              ]
+            }
+          },
+          {
+            "name": "assigned_to_id",
+            "in": "query",
+            "required": false,
+            "description": "get issues which are assigned to the given user id. me can be used instead an ID to fetch all issues from the logged in user (via API key or HTTP auth)",
+            "schema": {
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string",
+                  "enum": ["me",""]
+                }
+              ]
+            }
+          },
+          {
+            "name": "parent_id",
+            "in": "query",
+            "required": false,
+            "description": "get issues whose parent issue is given id",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "cf_x",
+            "in": "query",
+            "required": false,            
+            "description": "get issues with the given value for custom field with an ID of x. (Custom field must have 'used as a filter' checked.)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "author_id",
+            "in": "query",
+            "required": false,
+            "description": "",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "watcher_id",
+            "in": "query",
+            "required": false,
+            "description": "",
+            "schema": {
+              "type": "integer"
+            }
+          },          
+          {
+            "name": "child_id",
+            "in": "query",
+            "required": false,
+            "description": "",
+            "schema": {
+              "type": "integer"
+            }
+          },           
+          {
+            "name": "member_of_group",
+            "in": "query",
+            "required": false,
+            "description": "",
+            "schema": {
+              "type": "integer"
+            }
+          },          
+          {
+            "name": "assigned_to_role",
+            "in": "query",
+            "required": false,
+            "description": "",
+            "schema": {
+              "type": "integer"
+            }
+          },  
+          {
+            "name": "fixed_version_id",
+            "in": "query",
+            "required": false,
+            "description": "",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "category_id",
+            "in": "query",
+            "required": false,
+            "description": "",
+            "schema": {
+              "type": "integer"
+            }
+          },            
+          {
+            "name": "subject",
+            "in": "query",
+            "required": false,
+            "description": "may use ~ before string value",
+            "schema": {
+              "type": "string"
+            }
+          }, 
+          {
+            "name": "description",
+            "in": "query",
+            "required": false,
+            "description": "may use ~ before string value",
+            "schema": {
+              "type": "string"
+            }
+          },                      
+          {
+            "name": "notes",
+            "in": "query",
+            "required": false,
+            "description": "may use ~ before string value",
+            "schema": {
+              "type": "string"
+            }
+          }, 
+          {
+            "name": "closed_on",
+            "in": "query",
+            "required": false,
+            "description": "may use ~ before string value",
+            "schema": {
+              "type": "string"
+            }
+          }, 
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "description": "",
+            "schema": {
+              "type": "string"
+            }
+          },                 
+          {
+            "name": "due_date",
+            "in": "query",
+            "required": false,
+            "description": "",
+            "schema": {
+              "type": "string"
+            }
+          }, 
+          {
+            "name": "estimated_hours",
+            "in": "query",
+            "required": false,
+            "description": "",
+            "schema": {
+              "type": "number"
+            }
+          },  
+          {
+            "name": "spent_time",
+            "in": "query",
+            "required": false,
+            "description": "",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "done_ratio",
+            "in": "query",
+            "required": false,
+            "description": "",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "is_private",
+            "in": "query",
+            "required": false,
+            "description": "",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "attachment",
+            "in": "query",
+            "required": false,
+            "description": "may has ~ at the beginning. Search into field 'filename' attachments",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "attachment_description",
+            "in": "query",
+            "required": false,
+            "description": "may has ~ at the beginning. Search into field 'description' attachments",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "updated_by",
+            "in": "query",
+            "required": false,
+            "description": "id an user which has made changes in journal",
+            "schema": {
+              "type": "integer"
+            }
+          }, 
+          {
+            "name": "last_updated_by",
+            "in": "query",
+            "required": false,
+            "description": "id a last user which has made changes in journal",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+           "name": "relation_type",
+           "in": "query",
+           "required": false,
+           "description": "array of string through comma",
+           "schema":{
+            "type": "string"
+           } 
+          }, 
+          {
+            "name":"created_on",
+            "in": "query",
+            "required": false,            
+            "description": "To fetch issues for a date range",
+            "schema": {
+              "type": "string"
+            }            
+          },
+          {
+            "name":"updated_on",
+            "in": "query",
+            "required": false,            
+            "description": "To fetch issues updated after a certain timestamp",
+            "schema": {
+              "type": "string"
+            }            
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/IssueList"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "404":{
+            "$ref": "#/components/responses/404"
+          },
+          "default":{
+            "$ref": "#/components/responses/UnknownError"
+          }      
+        }
+      },
+      "post": {
+        "tags": [
+          "Issues"
+        ],
+        "summary": "Creating an issue",
+        "description": "Creating a new issue",
+        "operationId":"IssueCreate", 
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/format"
+          }          
+        ],               
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IssueNew"
+              }
+            }
+          }
+        },        
+        "responses": {
+          "201": {
+            "description": "Created: issue was created"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      }
+    },
+    "/issues/{issue_id}.{format}": {
+      "get": {
+        "tags": [
+          "Issues"
+        ],
+        "summary": "Showing an issue",
+        "operationId": "IssueShow",        
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/issue_id"
+          },
+          {
+            "$ref": "#/components/parameters/format"
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "required": false,
+            "description": "fetch associated data (optional, use comma to fetch multiple associations). Possible values:",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["children","attachments","relations","changesets","journals","watchers","allowed_statuses"],
+                "description":"allowed_statuses - Since 5.0.x, Returns the available allowed statuses (the same values as provided in the issue edit form) based on:\n* the issue's current tracker, the issue's current status, and the member's role (the defined workflow);\n* the existence of any open subtask(s);\n* the existence of any open blocking issue(s);\n* the existence of a closed parent issue.\n"                
+              }
+            },
+            "explode": false  
+          }           
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/IssueShow"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "404":{
+            "$ref": "#/components/responses/404"
+          },
+          "default":{
+            "$ref": "#/components/responses/UnknownError"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Issues"
+        ],
+        "summary": "Updating an issue",
+        "operationId": "IssueUpdate",        
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/issue_id"
+          },
+          {
+            "$ref": "#/components/parameters/format"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IssueUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }          
+        }
+      },
+      "delete": {
+        "tags": [
+          "Issues"
+        ],
+        "summary": "Deleting an issue",
+        "operationId": "IssueDelete",        
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/issue_id"            
+          },
+          {
+            "$ref": "#/components/parameters/format"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "404":{
+            "$ref": "#/components/responses/404"
+          }          
+        }
+      }
+    },
+    "/issues/{issue_id}/relations.{format}": {
+      "get":{
+        "tags": [
+          "Relation"
+        ],
+        "summary": "returns the relations for the issue of given id (:issue_id).",
+        "operationId": "RelationList",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/issue_id"            
+          },
+          {
+            "$ref": "#/components/parameters/format"
+          }
+        ],
+        "responses": {
+          "200":{
+            "$ref": "#/components/responses/RelationList"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "404":{
+            "$ref": "#/components/responses/404"
+          },
+          "default":{
+            "$ref": "#/components/responses/UnknownError"
+          }
+        }        
+      },
+      "post":{
+        "tags": [
+          "Relation"
+        ],
+        "summary": "Creates a relation for the issue of given id (:issue_id).",
+        "operationId": "RelationCreate",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/issue_id"            
+          },
+          {
+            "$ref": "#/components/parameters/format"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json":{
+              "schema":{
+                "$ref": "#/components/schemas/RelationNew"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201":{
+            "description": "relation was created"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "422":{
+            "description": "relation was not created due to validation failures (response body contains the error messages)",
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      }      
+    },  
+    "/issues/{issue_id}/watchers.{format}": {
+      "post": {
+        "tags": [
+          "Issues"
+        ],
+        "summary": "Adding a watcher",
+        "operationId": "WatcherAdd",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/issue_id"            
+          },
+          {
+            "$ref": "#/components/parameters/format"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WatcherAdd"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          }
+        }
+      }
+    },
+    "/issues/{issue_id}/watchers/{user_id}.{format}": {
+      "delete": {
+        "tags": [
+          "Issues"
+        ],
+        "summary": "Removing a watcher",
+        "operationId": "WatcherDelete",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/issue_id"
+          },
+          {
+            "$ref": "#/components/parameters/user_id"
+          },
+          {
+            "$ref": "#/components/parameters/format"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "404":{
+            "$ref": "#/components/responses/404"
+          }
+        }
+      }
+    },
+    "/groups.{format}": {
+      "get":{
+        "tags": [
+          "Group"
+        ],
+        "summary": "Returns the list of groups.\nThis endpoint requires admin privileges.",
+        "operationId": "GroupList",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/format"
+          }
+        ],
+        "responses": {
+          "200":{
+            "$ref": "#/components/responses/GroupList"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "403":{
+            "$ref": "#/components/responses/403"
+          },
+          "404":{
+            "$ref": "#/components/responses/404"
+          },
+          "default":{
+            "$ref": "#/components/responses/UnknownError"
+          }
+        }
+      },
+      "post":{
+        "tags": [
+          "Group"
+        ],
+        "summary": "Creates a group.\nThis endpoint requires admin privileges.",
+        "operationId": "GroupCreate",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/format"
+          }
+        ],
+        "requestBody":{
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GroupNew"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201":{
+            "description":"group was created"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "403":{
+            "$ref": "#/components/responses/403"
+          },
+          "422":{
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      }      
+    },  
+    "/groups/{group_id}.{format}": {
+      "get": {
+        "tags": [
+          "Group"
+        ],
+        "summary": "Returns details of a group.\nThis endpoint requires admin privileges.",
+        "operationId": "GroupShow",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/group_id"
+          },
+          {
+            "$ref": "#/components/parameters/format"
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "required": false,
+            "description": "a coma separated list of associations to include in the response: ",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["users","memberships"] 
+              }
+            },
+            "explode": false  
+          }           
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GroupShow"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "403":{
+            "$ref": "#/components/responses/403"
+          },
+          "404":{
+            "$ref": "#/components/responses/404"
+          },
+          "default":{
+            "$ref": "#/components/responses/UnknownError"
+          }
+        }
+      },
+      "put":{
+        "tags": [
+          "Group"
+        ],
+        "summary": "Updates an existing group.\nThis endpoint requires admin privileges.",
+        "operationId": "GroupUpdate",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/group_id"
+          },
+          {
+            "$ref": "#/components/parameters/format"
+          }
+        ],
+        "requestBody":{
+          "content": {
+            "application/json":{
+              "schema":{
+                "$ref": "#/components/schemas/GroupUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204":{
+            "description": "Success"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "403":{
+            "$ref": "#/components/responses/403"
+          }
+        }          
+      },
+      "delete": {
+        "tags": [
+          "Group"
+        ],
+        "summary": "Deletes an existing group.\nThis endpoint requires admin privileges.",
+        "operationId": "GroupDelete",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/group_id"
+          },
+          {
+            "$ref": "#/components/parameters/format"
+          }           
+        ],
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "403":{
+            "$ref": "#/components/responses/403"
+          },
+          "404":{
+            "$ref": "#/components/responses/404"
+          }
+        }
+      }      
+    }, 
+    "/groups/{group_id}/users.{format}": {
+      "post": {
+        "tags": [
+          "Group"
+        ],
+        "summary": "Adds an existing user to a group. This endpoint requires admin privileges.",
+        "operationId": "UserAdd",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/group_id"
+          },
+          {
+            "$ref": "#/components/parameters/format"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserAdd"
+              }
+            }
+          }
+        },          
+        "responses": {
+          "204":{
+            "description": "user was added to the group"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "403":{
+            "$ref": "#/components/responses/403"
+          }
+        }
+      }
+    },                   
+    "/groups/{group_id}/users/{user_id}.{format}": {    
+      "delete":{
+        "tags": [
+          "Group"
+        ],
+        "summary": "Removes a user from a group. This endpoint requires admin privileges.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/group_id"
+          },
+          {
+            "$ref": "#/components/parameters/user_id"
+          },          
+          {
+            "$ref": "#/components/parameters/format"
+          }          
+        ],
+        "responses": {
+          "204":{
+            "description": "user was removed to the group"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "403":{
+            "$ref": "#/components/responses/403"
+          },
+          "404":{
+            "$ref": "#/components/responses/404"
+          }          
+        }        
+      }
+    },  
+    "/issue_statuses.{format}": {
+      "get": {
+        "tags": [
+          "IssueStatuses"
+        ],
+        "summary": "Returns possible Status Values for Issues",
+        "operationId": "StatusesList",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/format"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/StatusesList"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "404":{
+            "$ref": "#/components/responses/404"
+          },
+          "default":{
+            "$ref": "#/components/responses/UnknownError"
+          }
+        }
+      }
+    },
+    "/trackers.{format}": {
+      "get": {
+        "tags": [
+          "Trackers"
+        ],
+        "summary": "List trackers",
+        "description": "Returns the list of all trackers.",
+        "operationId": "TrackersList",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/format"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/TrackerList"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "404":{
+            "$ref": "#/components/responses/404"
+          },
+          "default":{
+            "$ref": "#/components/responses/UnknownError"
+          }
+        }
+      }
+    },
+    "/users.{format}": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Returns a list of users. This endpoint requires admin privileges.",
+        "operationId": "UsersList",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/format"
+          },
+          {
+            "$ref": "#/components/parameters/offset_param"
+          },
+          {
+            "$ref": "#/components/parameters/limit_param"
+          },          
+          {
+            "name": "status",
+            "in": "query",
+            "description": "get only users with the given status. See app/models/principal.rb for a list of available statuses. Supply an empty value to match all users regardless of their status. Default is 1 (active users)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default":"1",
+              "enum": [
+                "0","1","2","3"
+              ]
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "description": "filter users on their login, firstname, lastname and mail ; if the pattern contains a space, it will also return users whose firstname match the first word or lastname match the second word",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "group_id",
+            "in": "query",
+            "description": "get only users who are members of the given group. Don't replace components/parameters/group_id",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }          
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/UserList"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "403":{
+            "$ref": "#/components/responses/403"
+          },
+          "404":{
+            "$ref": "#/components/responses/404"
+          },
+          "default":{
+            "$ref": "#/components/responses/UnknownError"
+          }
+        }
+      },
+      "post":{
+        "tags": [
+          "Users"
+        ],
+        "summary": "Creates a user.This endpoint requires admin privileges.",
+        "operationId": "UserCreate",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/format"
+          }          
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserNew"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201":{
+            "description": "user was created"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "403":{
+            "$ref": "#/components/responses/403"
+          },
+          "422":{
+            "description": "user was not created due to validation failures (response body contains the error messages)",
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }        
+      }
+    },
+    "/users/{user_id}.{format}": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Returns the user details. You can use /users/current.:format for retrieving the user whose credentials are used to access the API.\nThis endpoint can be used by admin or non admin but the returned fields will depend on the privileges of the requesting user",
+        "operationId": "UserShow",        
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/user_id"
+          },
+          {
+            "$ref": "#/components/parameters/format"
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "description": "a comma separated list of associations to include in the response: ",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["memberships","groups"],
+                "description":"memberships - adds extra information about user's memberships and roles on the projects\ngroups - adds extra information about user's groups\n"
+              }
+            },
+            "explode": false  
+          }           
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/UserShow"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "403":{
+            "$ref": "#/components/responses/403"
+          },
+          "404":{
+            "$ref": "#/components/responses/404"
+          },
+          "default":{
+            "$ref": "#/components/responses/UnknownError"
+          }
+        }
+      },
+      "put":{
+        "tags": ["User"],
+        "summary": "Updates a user.\nThis endpoint requires admin privileges.",
+        "operationId": "UserUpdate",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/user_id"
+          },
+          {
+            "$ref": "#/components/parameters/format"
+          }            
+        ],
+        "requestBody":{
+          "content": {
+            "application/json":{
+              "schema":{
+                "$ref": "#/components/schemas/UserUpdate"
+              }
+            }
+          } 
+        },
+        "responses": {
+          "204":{
+            "description": ""
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "403":{
+            "$ref": "#/components/responses/403"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "User"
+        ],
+        "summary": "This endpoint requires admin privileges.\nDeletes a user.",
+        "operationId": "UserDelete",        
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/user_id"
+          },
+          {
+            "$ref": "#/components/parameters/format"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "user was deleted"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "403":{
+            "$ref": "#/components/responses/403"
+          },
+          "404":{
+            "$ref": "#/components/responses/404"
+          }
+        }
+      }      
+    },
+    "/versions/{version_id}.{format}":{
+      "get":{
+        "tags": ["Version"],
+        "summary": "Returns the version of given id.",
+        "operationId": "VersionShow",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/version_id"
+          },
+          {
+            "$ref": "#/components/parameters/format"
+          }
+        ],
+        "responses": {
+          "200":{
+            "$ref": "#/components/responses/VersionShow"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "404":{
+            "$ref": "#/components/responses/404"
+          },
+          "default":{
+            "$ref": "#/components/responses/UnknownError"
+          }
+        }
+      },
+      "put":{
+        "tags": ["Version"],
+        "summary": "Updates the version of given id",
+        "operationId": "VersionUpdate",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/version_id"
+          },
+          {
+            "$ref": "#/components/parameters/format"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json":{
+              "schema":{
+                "$ref": "#/components/schemas/VersionUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204":{
+            "description": "version was updated"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "422":{
+            "description": "version was not updated due to validation failures (response body contains the error messages)",
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      },
+      "delete":{
+        "tags": ["Version"],
+        "summary": "Deletes the version of given id.",
+        "operationId": "VersionDelete",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/version_id"
+          },
+          {
+            "$ref": "#/components/parameters/format"
+          }
+        ],
+        "responses": {
+          "204":{
+            "description": " version was deleted"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "404":{
+            "$ref": "#/components/responses/404"
+          },
+          "422":{
+            "description": " version was not deleted (response body contains the error messages)",
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }        
+      }
+    },
+    "/issues/{issue_id}/checklists.{format}": {
+      "get": {
+        "tags": [
+          "Checklists"
+        ],
+        "summary": "Returns list of checklist items for issue issue_id",
+        "operationId": "ChecklistList",        
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/issue_id"
+          },
+          {
+            "$ref": "#/components/parameters/format"
+          }           
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/CheckListList"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "404":{
+            "$ref": "#/components/responses/404"
+          },
+          "default":{
+            "$ref": "#/components/responses/UnknownError"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Checklists"
+        ],
+        "summary": "Creating a checklist",
+        "operationId": "CheckListCreate",        
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/issue_id"
+          },
+          {
+            "$ref": "#/components/parameters/format"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckListNew"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          }
+        }
+      }      
+    }, 
+    "/custom_fields.{format}": {
+      "get":{
+        "tags": ["CustomFields"],
+        "summary": "Returns all the custom fields definitions.\nThis endpoint requires admin privileges.",
+        "operationId": "CustomFieldList",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/format"
+          }          
+        ],
+        "responses": {
+          "200":{
+            "$ref": "#/components/responses/CustomFieldsList"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "403":{
+            "$ref": "#/components/responses/403"
+          },
+          "404":{
+            "$ref": "#/components/responses/404"
+          },
+          "default":{
+            "$ref": "#/components/responses/UnknownError"
+          }
+        }
+      }
+    },  
+    "/checklists/{checklist_id}.{format}": {
+      "put": {
+        "tags": [
+          "Checklists"
+        ],
+        "summary": "Updating a checklist",
+        "operationId":"ChecklistUpdate",        
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/checklist_id"
+          },
+          {
+            "$ref": "#/components/parameters/format"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckListUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          }
+        }
+      }
+    },
+    "/enumerations/{type}.{format}": {
+      "get": {
+        "tags": [
+          "Enumerations"
+        ],
+        "summary": "Returns enum for given Type",
+        "operationId": "EnumList",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/type"
+          },          
+          {
+            "$ref": "#/components/parameters/format"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/EnumList"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "404":{
+            "$ref": "#/components/responses/404"
+          },
+          "default":{
+            "$ref": "#/components/responses/UnknownError"
+          }
+        }
+      }
+    },
+    "/projects.{format}": {
+      "get": {
+        "tags": [
+          "Projects"
+        ],
+        "summary": "Listing projects",
+        "description": "Returns all projects (all public projects and private projects where user have access to)",
+        "operationId":"ProjectsList",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/format"
+          },
+          {
+            "$ref": "#/components/parameters/offset_param"
+          },
+          {
+            "$ref": "#/components/parameters/limit_param"
+          },          
+          {
+            "name": "include",
+            "in": "query",
+            "required": false,            
+            "description": "fetch associated data (optional). Possible values: trackers, issue_categories, enabled_modules (since 2.6.0).\nValues should be separated by a comma \",\".\n",
+            "schema": {
+              "type": "array",
+              "items":{
+                "type":"string",
+                "enum": ["trackers","issue_categories","enabled_modules","time_entry_activities","issue_custom_fields"]
+              }
+            },
+            "explode": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ProjectList"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "404":{
+            "$ref": "#/components/responses/404"
+          },
+          "default":{
+            "$ref": "#/components/responses/UnknownError"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Projects"
+        ],
+        "summary": "Creating a project",
+        "description": "Creates a the project",
+        "operationId": "ProjectCreate",        
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/format"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectNew"
+              }
+            }
+          },
+          "required": false
+        },   
+        "responses": {
+          "201": {
+            "description": "project was created"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "422": {
+            "description": "project was not created due to validation failures (response body contains the error messages)",
+            "$ref": "#/components/responses/ValidationError"
+          }          
+        }
+      }
+    },
+    "/projects/{project_id}.{format}": {
+      "get": {
+        "tags": [
+          "Projects"
+        ],
+        "summary": "Showing a project",
+        "description": "Returns the project of given id or identifier.",
+        "operationId": "ProjectShow",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/project_id"
+          },
+          {
+            "$ref": "#/components/parameters/format"
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "description": "fetch associated data (optional). Possible values: trackers, issue_categories, enabled_modules (since 2.6.0).\nValues should be separated by a comma \",\".\n",
+            "schema": {
+              "type": "array",
+              "items":{
+                "type":"string",
+                "enum": ["trackers","issue_categories","enabled_modules","time_entry_activities","issue_custom_fields"]
+              }
+            },
+            "explode": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ProjectShow"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "404":{
+            "$ref": "#/components/responses/404"
+          },
+          "default":{
+            "$ref": "#/components/responses/UnknownError"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Projects"
+        ],
+        "summary": "Updating a project",
+        "description": "Updates the project of given id or identifier.",
+        "operationId": "ProjectUpdate",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/project_id"
+          },
+          {
+            "$ref": "#/components/parameters/format"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectUpdate"
+              }
+            }
+          },
+          "required": false
+        },        
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Projects"
+        ],
+        "summary": "Deleting a project",
+        "description": "Deletes the project of given id or identifier.",
+        "operationId": "ProjectDelete",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/project_id"
+          },
+          {
+            "$ref": "#/components/parameters/format"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "404":{
+            "$ref": "#/components/responses/404"
+          }
+        }
+      }
+    },
+    "/projects/{project_id}/versions.{format}": {
+      "get":{
+        "tags": ["Version"],
+        "summary": "Returns the versions available for the project of given id or identifier (:project_id). The response may include shared versions from other projects.",
+        "operationId": "VersionList",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/project_id"
+          },
+          {
+            "$ref": "#/components/parameters/format"
+          }
+        ],
+        "responses": {
+          "200":{
+            "$ref": "#/components/responses/VersionList"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "404":{
+            "$ref": "#/components/responses/404"
+          },
+          "default":{
+            "$ref": "#/components/responses/UnknownError"
+          }
+        }        
+      },
+      "post":{
+        "tags": ["Version"],
+        "summary": "Creates a version for the project of given id or identifier (:project_id).",
+        "operationId": "VersionCreate",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/project_id"
+          },
+          {
+            "$ref": "#/components/parameters/format"
+          }
+        ],
+        "requestBody":{
+          "content": {
+            "application/json":{
+              "schema":{
+                "$ref": "#/components/schemas/VersionNew"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201":{
+            "description": "version was created"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "422":{
+            "description": " version was not created due to validation failures (response body contains the error messages)",
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      }
+    },  
+    "/issue_categories/{issue_category_id}.{format}":{
+      "get":{
+        "tags": ["Category"],
+        "summary": "Returns the issue category of given id.",
+        "operationId": "IssueCategoryShow",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/issue_category_id"
+          },
+          {
+            "$ref": "#/components/parameters/format"
+          }
+        ],
+        "responses": {
+          "200":{
+            "$ref": "#/components/responses/IssueCategoryShow"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "404":{
+            "$ref": "#/components/responses/404"
+          },
+          "default":{
+            "$ref": "#/components/responses/UnknownError"
+          }
+        }
+      },
+      "put":{
+        "tags": ["Category"],
+        "summary": "Updates the issue category of given id",
+        "operationId": "IssueCategoryUpdate",        
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/issue_category_id"
+          },
+          {
+            "$ref": "#/components/parameters/format"
+          }          
+        ],
+        "requestBody":{
+          "content": {
+            "application/json":{
+              "schema":{
+                "$ref": "#/components/schemas/IssueCategoryUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201":{
+            "description": " issue category was created"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "422":{
+            "description": "issue category was not created due to validation failures (response body contains the error messages)",
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      },
+      "delete":{
+        "tags": ["Category"],
+        "summary": "Deletes the issue category of given id.",
+        "operationId": "IssueCategoryDelete",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/issue_category_id"
+          },
+          {
+            "$ref": "#/components/parameters/format"
+          },
+          {
+            "name": "reassign_to_id ",
+            "in": "query",
+            "description": "when there are issues assigned to the category you are deleting, this parameter lets you reassign these issues to the category with this id",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }                    
+          }
+        ],
+        "responses": {
+          "204":{
+            "description": "issue category was deleted"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "404":{
+            "$ref": "#/components/responses/404"
+          }
+        }
+      }
+    },
+    "/projects/{project_id}/issue_categories.{format}": {
+      "get": {
+        "tags": [
+          "Category"
+        ],
+        "summary": "Returns the issue categories available for the project of given id or identifier (:project_id).",
+        "operationId": "IssueCategoryList",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/project_id"
+          },
+          {
+            "$ref": "#/components/parameters/format"
+          }
+        ],
+        "responses": {
+          "200":{
+            "$ref": "#/components/responses/IssueCategoryList"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "404":{
+            "$ref": "#/components/responses/404"
+          },
+          "default":{
+            "$ref": "#/components/responses/UnknownError"
+          }
+        }
+      },
+      "post":{
+        "tags": ["Category"],
+        "summary": "Creates an issue category for the project of given id or identifier (:project_id).",
+        "operationId": "IssueCategoryCreate",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/project_id"
+          },
+          {
+            "$ref": "#/components/parameters/format"
+          }
+        ],
+        "requestBody":{
+          "$ref": "#/components/schemas/IssueCategoryNew"
+        },
+        "responses": {
+          "201":{
+            "description":"issue category was created"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "422":{
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      }
+    },
+    "/projects/{project_id}/memberships.{format}": {
+      "get": {
+        "tags": [
+          "Projects"
+        ],
+        "summary": "Returns a paginated list of the project memberships. :project_id can be either the project numerical id or the project identifier.",
+        "operationId": "MemberShipList",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/project_id"
+          },
+          {
+            "$ref": "#/components/parameters/format"
+          }
+        ],
+        "responses": {
+          "200":{
+            "$ref": "#/components/responses/MemberShipList"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "404":{
+            "$ref": "#/components/responses/404"
+          },
+          "default":{
+            "$ref": "#/components/responses/UnknownError"
+          }
+        }
+      },
+      "post":{
+        "tags": [
+          "Projects"
+        ],
+        "summary": "Adds a project member.",
+        "operationId": "MemberShipAdd",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/project_id"
+          },
+          {
+            "$ref": "#/components/parameters/format"
+          }          
+        ],
+        "requestBody":{
+          "content": {
+            "application/json":{
+              "schema":{
+                "$ref": "#/components/schemas/MemberShipAdd"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201":{
+            "description": "membership was created"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "422":{
+            "$ref": "#/components/responses/ValidationError",
+            "description": "membership was not created due to validation failures (response body contains the error messages)"            
+          }
+        }
+      }
+    },        
+    "/my/account.{format}": {
+      "get": {
+        "tags": [
+          "MyAccount"
+        ],
+        "summary": "Shows Account data",
+        "description": "Returns the Users Account data.",
+        "operationId": "AccountShow",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/format"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/AccountShow"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "404":{
+            "$ref": "#/components/responses/404"
+          },
+          "default":{
+            "$ref": "#/components/responses/UnknownError"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "MyAccount"
+        ],
+        "summary": "Updates your account.",
+        "description": "Updates the Users Account data.",
+        "operationId": "AccountUpdate",        
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/format"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountUpdate"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "422":{
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      }
+    },
+    "/journals/{journal_id}.{format}": {
+      "put": {
+        "tags": ["Journal"],
+        "summary": "",
+        "operationId": "JournalUpdate",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/journal_id"
+          },
+          {
+            "$ref": "#/components/parameters/format"
+          }          
+        ],
+        "requestBody":{
+          "content": {
+            "application/json":{
+              "schema":{
+                "$ref": "#/components/schemas/JournalUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204":{
+            "description": "Success"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          }
+        }
+      }
+    },        
+    "/time_entries.{format}": {
+      "get": {
+        "tags": [
+          "TimeEntries"
+        ],
+        "summary": "Shows Time entries",
+        "description": "Returns Time entries.",
+        "operationId": "TimeList",        
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/format"
+          },
+          {
+            "$ref": "#/components/parameters/offset_param"
+          },
+          {
+            "$ref": "#/components/parameters/limit_param"
+          },
+          {
+            "name": "project_id",
+            "in": "query",
+            "description": "The user identifier number",
+            "required": false,
+            "schema": {
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string",
+                  "default":""
+                }                
+              ]
+            }
+          },
+          {
+            "name": "subproject_id",
+            "in": "query",
+            "description": "The user identifier number",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },          
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "description": "The user identifier number",
+            "schema": {
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string",
+                  "enum": ["me","*",""]
+                }
+              ]
+            }
+          },
+          {
+            "name": "spent_on",
+            "in": "query",
+            "required": false,
+            "description": "The user identifier number",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "description": "Date syntax: YYYY-MM-DD",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "description": "Date syntax: YYYY-MM-DD",
+            "required": false,
+            "schema": {
+              "type": "string"              
+            }
+          },          
+          {
+            "name": "issue_id",
+            "required": false,            
+            "in": "query",
+            "description": "The user identifier number",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "author_id",
+            "required": false,            
+            "in": "query",
+            "description": "The user identifier number",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "activity_id",
+            "required": false,            
+            "in": "query",
+            "description": "The user identifier number",
+            "schema": {
+              "type": "integer"
+            }
+          },  
+          {
+            "name": "comments",
+            "required": false,            
+            "in": "query",
+            "description": "",
+            "schema": {
+              "type": "string"
+            }
+          },                   
+          {
+            "name": "hours",
+            "required": false,            
+            "in": "query",
+            "description": "",
+            "schema": {
+              "type": "string"
+            }
+          },          
+          {
+            "name": "sort",
+            "required": false,            
+            "in": "query",
+            "description": "sort=spent_on:desc",
+            "schema": {
+              "type": "string"
+            }
+          }          
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/TimeList"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "404":{
+            "$ref": "#/components/responses/404"
+          },
+          "default":{
+            "$ref": "#/components/responses/UnknownError"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "TimeEntries"
+        ],
+        "summary": "Creates Time entry",
+        "description": "Creates a new Time entry.",
+        "operationId": "TimeCreate",        
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/format"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TimeNewUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created: time entry was created"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      }
+    },
+    "/time_entries/{entry_id}.{format}": {
+      "get":{
+        "summary": "Show time entry",
+        "description": "Returns the time entry of given id.",
+        "operationId": "TimeShow",
+        "tags": [
+          "TimeEntries"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/entry_id"
+          },
+          {
+            "$ref": "#/components/parameters/format"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/TimeShow"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "404":{
+            "$ref": "#/components/responses/404"
+          },
+          "default":{
+            "$ref": "#/components/responses/UnknownError"
+          }
+        }                
+      },
+      "put": {
+        "tags": [
+          "TimeEntries"
+        ],
+        "summary": "Updates Time entry",
+        "description": "Updates the Users Account data",
+        "operationId": "TimeUpdate",        
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/entry_id"
+          },
+          {
+            "$ref": "#/components/parameters/format"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TimeNewUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "time entry was updated"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "422": {
+            "description":"time entry was not updated due to validation failures (response body contains the error messages)",
+            "$ref": "#/components/responses/ValidationError"
+          }          
+        }
+      },
+      "delete":{
+        "tags": [
+          "TimeEntries"
+        ],        
+        "summary": "Delete a time entry",
+        "operationId": "TimeDelete",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/entry_id"
+          },
+          {
+            "$ref": "#/components/parameters/format"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "404":{
+            "$ref": "#/components/responses/404"
+          }
+        }        
+      }
+    },
+    "/memberships/{membership_id}.{format}":{
+      "get":{
+        "tags": [
+          "MemberShip"
+        ],
+        "summary": "Returns the membership of given :id.",
+        "operationId": "MemberShipShow",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/membership_id"
+          },
+          {
+            "$ref": "#/components/parameters/format"
+          }          
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/MemberShipShow"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "404":{
+            "$ref": "#/components/responses/404"
+          },
+          "default":{
+            "$ref": "#/components/responses/UnknownError"
+          }
+        }       
+      },
+      "put": {
+        "tags": [
+          "MemberShip"
+        ],
+        "summary": "Updates the membership of given :id. Only the roles can be updated, the project and the user of a membership are read-only.",
+        "operationId": "MemberShipUpdate",        
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/membership_id"
+          },
+          {
+            "$ref": "#/components/parameters/format"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MemberShipUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "membership was updated"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "422": {
+            "description":"membership was not updated due to validation failures (response body contains the error messages)",
+            "$ref": "#/components/responses/ValidationError"
+          }          
+        }
+      },      
+      "delete":{
+        "tags": [
+          "MemberShip"
+        ],
+        "summary": "Deletes a memberships.\nMemberships inherited from a group membership can not be deleted. You must delete the group membership.",
+        "operationId": "MemberShipDelete",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/membership_id"
+          },
+          {
+            "$ref": "#/components/parameters/format"
+          }          
+        ],
+        "responses": {
+          "204": {
+            "description": "membership was deleted"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "404":{
+            "$ref": "#/components/responses/404"
+          },
+          "422":{
+            "description":"membership was not deleted",
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }               
+      }
+    },
+    "/relations/{relation_id}.{format}":{
+      "get":{
+        "tags": [
+          "Relation"
+        ],
+        "summary": "Returns the relation of given id.",
+        "operationId": "RelationShow",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/relation_id"
+          },
+          {
+            "$ref": "#/components/parameters/format"
+          }          
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/RelationShow"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "404":{
+            "$ref": "#/components/responses/404"
+          },
+          "default":{
+            "$ref": "#/components/responses/UnknownError"
+          }
+        }       
+      },
+      "delete":{
+        "tags": [
+          "Relation"
+        ],
+        "summary": "Deletes the relation of given id.",
+        "operationId": "RelationDelete",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/relation_id"
+          },
+          {
+            "$ref": "#/components/parameters/format"
+          }          
+        ],
+        "responses": {
+          "204": {
+            "description": "relation was deleted"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "422":{
+            "description":"relation was not deleted (response body contains the error messages)",
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }               
+      }
+    },
+    "/search.{format}":{
+      "get":{
+        "summary": "Returns the search results by the specified condition parameters",
+        "operationId": "Search",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/format"
+          },
+          {
+            "$ref": "#/components/parameters/offset_param"
+          },
+          {
+            "$ref": "#/components/parameters/limit_param"
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "description": "query strings. enable to specify multiple values separated by a space ' '",
+            "schema": {
+              "type": "string"
+            } 
+          },
+          {
+            "name": "scope",
+            "in": "query",
+            "required": false,
+            "description": "search scope condition",
+            "schema": {
+              "type": "string",
+              "description": " 'search all projects', 'search assigned projects', 'include subproject when project specified' ",
+              "enum": ["all","my_project","subprojects"]
+            } 
+          },
+          {
+            "name": "all_words",
+            "in": "query",
+            "required": false,
+            "description": "matched all query strings or not",
+            "schema": {
+              "type": "integer",
+              "default":1
+            } 
+          },          
+          {
+            "name": "titles_only",
+            "in": "query",
+            "required": false,
+            "description": " matched only title or not",
+            "schema": {
+              "type": "integer",
+              "default":1
+            } 
+          },                    
+          {
+            "name": "issues",
+            "in": "query",
+            "required": false,
+            "description": "include Issues or not",
+            "schema": {
+              "type": "integer",
+              "default":1
+            } 
+          },           
+          {
+            "name": "news",
+            "in": "query",
+            "required": false,
+            "description": "include News or not",
+            "schema": {
+              "type": "integer",
+              "default":1
+            } 
+          },           
+          {
+            "name": "documents",
+            "in": "query",
+            "required": false,
+            "description": "include Documents or not",
+            "schema": {
+              "type": "integer",
+              "default":1
+            } 
+          }, 
+          {
+            "name": "changesets",
+            "in": "query",
+            "required": false,
+            "description": "include Changesets or not",
+            "schema": {
+              "type": "integer",
+              "default":1
+            } 
+          },                    
+          {
+            "name": "wiki_pages",
+            "in": "query",
+            "required": false,
+            "description": "include Wiki Pages or not",
+            "schema": {
+              "type": "integer",
+              "default":1
+            } 
+          },          
+          {
+            "name": "messages",
+            "in": "query",
+            "required": false,
+            "description": "include Messages or not",
+            "schema": {
+              "type": "integer",
+              "default":1
+            } 
+          },   
+          {
+            "name": "projects",
+            "in": "query",
+            "required": false,
+            "description": "include Projects or not",
+            "schema": {
+              "type": "integer",
+              "default":1
+            } 
+          }, 
+          {
+            "name": "open_issues",
+            "in": "query",
+            "required": false,
+            "description": "filtered by open issues",
+            "schema": {
+              "type": "integer",
+              "default":1
+            } 
+          }, 
+          {
+            "name": "attachments",
+            "in": "query",
+            "required": false,
+            "description": "filtered by description and attachment ",
+            "schema": {
+              "type": "integer",
+              "enum": ["0","1","only"]
+            } 
+          }                                        
+        ],
+        "responses": {
+          "200":{
+            "$ref": "#/components/responses/SearchList"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "404":{
+            "$ref": "#/components/responses/404"
+          },
+          "default":{
+            "$ref": "#/components/responses/UnknownError"
+          }
+        }
+      }
+    },
+    "/queries.{format}":{
+      "get":{
+        "tags": [
+          "Queries"
+        ],
+        "summary": "Returns the list of all custom queries visible by the user (public and private queries) for all projects.",
+        "operationId": "QueriesList",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/format"
+          }
+        ],
+        "responses": {
+          "200":{
+            "$ref": "#/components/responses/QueriesList"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "404":{
+            "$ref": "#/components/responses/404"
+          },
+          "default":{
+            "$ref": "#/components/responses/UnknownError"
+          }
+        }
+      }
+    },
+    "/roles.{format}":{
+      "get":{
+        "tags": [
+          "Roles"
+        ],
+        "summary": "Returns the list of roles.",
+        "operationId": "RolesList",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/format"
+          }
+        ],
+        "responses": {
+          "200":{
+            "$ref": "#/components/responses/RolesList"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "404":{
+            "$ref": "#/components/responses/404"
+          },
+          "default":{
+            "$ref": "#/components/responses/UnknownError"
+          }
+        }
+      }      
+    },
+    "/roles/{role_id}.{format}":{
+      "get":{
+        "tags": [
+          "Roles"
+        ],
+        "summary": "Returns the list of permissions for a given role",
+        "operationId": "RoleShow",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/role_id"
+          },
+          {
+            "$ref": "#/components/parameters/format"
+          }
+        ],
+        "responses": {
+          "200":{
+            "$ref": "#/components/responses/RoleShow"
+          },
+          "401":{
+            "$ref": "#/components/responses/401"
+          },
+          "404":{
+            "$ref": "#/components/responses/404"
+          },
+          "default":{
+            "$ref": "#/components/responses/UnknownError"
+          }
+        }
+      }
+    }        
+  },
+  "components": {
+    "schemas": {
+      "Attachment":{
+        "type": "object",
+        "properties": {
+          "id":{
+            "type": "integer"
+          },
+          "filename":{
+            "type": "string"
+          },
+          "filesize":{
+            "type": "integer"
+          },
+          "content_type":{
+            "type": "string"
+          },
+          "description":{
+            "type": "string"
+          },
+          "content_url":{
+            "type": "string"
+          },
+          "author":{
+            "$ref": "#/components/schemas/IdName"
+          },
+          "created_on":{
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "AccountUpdate": {
+        "type": "object",
+        "properties": {
+          "user":{
+            "type": "object",
+            "properties": {
+              "login": {
+                "type": "string"
+              },
+              "admin": {
+                "type": "boolean"
+              },
+              "password":{
+                "type": "string"
+              },
+              "firstname": {
+                "type": "string"
+              },
+              "lastname": {
+                "type": "string"
+              },
+              "mail": {
+                "type": "string"
+              },
+              "language":{
+                "type": "string"
+              },
+              "auth_source_id":{
+                "type": "integer"
+              },
+              "mail_notification":{
+                "type": "string",
+                "enum": ["all","selected","only_my_events","only_assigned","only_owner","none"]
+              },
+              "notified_project_ids":{
+                "type": "array",
+                "items":{
+                  "type": "integer"
+                }
+              },
+              "must_change_passwd":{
+                "type": "boolean"
+              },
+              "generate_password":{
+                "type": "boolean"
+              },
+              "status":{
+                "description": "a numeric id representing the status of the user, visible for admins only (added in 2.4.0). STATUS_ANONYMOUS = 0; STATUS_ACTIVE=1; STATUS_REGISTERED=2; STATUS_LOCKED=3",
+                "type": "integer"
+              },
+              "custom_fields":{
+                "type": "array",
+                "items":{
+                  "$ref": "#/components/schemas/CustomField"
+                }
+              },
+              "custom_field_values":{
+                "$ref": "#/components/schemas/FieldValue"
+              },
+              "group_ids":{
+                "type": "array",
+                "items":{
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "pref":{
+            "type": "object",
+            "properties": {
+              "hide_mail":{
+                "type": "boolean"
+              },
+              "time_zone":{
+                "type": "string"
+              },
+              "comments_sorting":{
+                "type": "string",
+                "enum": ["asc","desc"]
+              },
+              "warn_on_leaving_unsaved":{
+                "type": "boolean"
+              },
+              "no_self_notified":{
+                "type": "boolean"
+              },
+              "notify_about_high_priority_issues":{
+                "type": "boolean"
+              },
+              "textarea_font":{
+                "type": "string",
+                "enum": ["monospace","proportional"]
+              },
+              "recently_used_projects":{
+                "type": "integer"
+              },
+              "history_default_tab":{
+                "type": "string",
+                "enum": ["notes","history","properties","time_entries","changesets","last_tab_visited"]
+              },
+              "toolbar_language_options":{
+                "type": "string"
+              },
+              "default_issue_query":{
+                "type": "integer"
+              },
+              "default_project_query":{
+                "type": "integer"
+              },
+              "auto_watch_on":{
+                "type": "string",
+                "default":"issue_contributed_to"
+              }
+            }
+          }
+        }
+      },            
+      "AccountShow": {
+        "type": "object",
+        "required": ["user"],
+        "properties": {
+          "user":{
+            "type": "object",
+            "required": [
+              "id",
+              "login",
+              "admin",
+              "firstname",
+              "lastname",
+              "mail",
+              "created_on",
+              "last_login_on",
+              "api_key",
+              "custom_fields"
+            ],
+            "properties": {
+              "id":{
+                "type": "integer"
+              },
+              "login": {
+                "type": "string"
+              },
+              "admin": {
+                "type": "boolean"
+              },
+              "firstname": {
+                "type": "string"
+              },
+              "lastname": {
+                "type": "string"
+              },
+              "mail": {
+                "type": "string"
+              },
+              "created_on":{
+                "type": "string",
+                "format": "date-time"
+              },
+              "last_login_on":{
+                "type": "string",
+                "format": "date-time"
+              },
+              "api_key":{
+                "type": "string"
+              },
+              "custom_fields":{
+                "type": "array",
+                "items":{
+                  "$ref": "#/components/schemas/CustomField"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ChangeSet":{
+        "type": "object",
+        "properties": {
+          "revision":{
+            "type": "string"
+          },
+          "user":{
+            "$ref": "#/components/schemas/IdName"
+          },
+          "comments":{
+            "type": "string"
+          },
+          "committed_on":{
+            "type": "string"
+          }
+        }
+      },                 
+      "CheckList": {
+        "required": [
+          "id",
+          "issue_id",
+          "subject",
+          "is_done"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "issue_id": {
+            "type": "integer"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "is_done": {
+            "type": "boolean"
+          },
+          "position": {
+            "type": "integer"
+          },
+          "is_section": {
+            "type": "boolean"
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string"
+          }          
+        }
+      },
+      "CheckListList":{
+        "required": [
+          "checklists",
+          "total_count"
+        ],
+        "type": "object",
+        "properties": {
+          "checklists": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CheckList"
+            }
+          },
+          "total_count": {
+            "type": "integer"
+          }
+        }        
+      },
+      "CheckListNew":{
+        "title": "Checklist Scheme",
+        "required": [
+          "checklist"
+        ],
+        "type": "object",
+        "properties": {
+          "checklist": {
+            "title": "Checklist",
+            "type": "object",
+            "properties": {
+              "issue_id": {
+                "type": "integer"
+              },
+              "subject": {
+                "type": "string"
+              },
+              "is_done": {
+                "type": "boolean",
+                "description": "'yes|no... field position low row was removed'\n"
+              }
+            }
+          }
+        }        
+      },
+      "CheckListUpdate":{
+        "title": "Checklist Scheme",
+        "required": [
+          "checklist"
+        ],
+        "type": "object",
+        "properties": {
+          "checklist":{
+            "$ref": "#/components/schemas/CheckList"
+          } 
+        }        
+      },
+      "Child":{
+        "type": "object",
+        "properties": {
+          "id":{
+            "type": "integer"
+          },
+          "tracker":{
+            "$ref": "#/components/schemas/IdName"
+          },
+          "status":{
+            "$ref": "#/components/schemas/IdName"
+          },
+          "subject":{
+            "type": "string"
+          }
+        }
+      },                  
+      "CustomField": {
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "multiple":{
+            "type": "boolean"
+          },
+          "value": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "array",
+                "items":{
+                  "type": "string"
+                }
+              }              
+            ]
+          }          
+        }
+      },
+      "CustomFieldsList":{
+        "type": "object",
+        "required": ["custom_fields"],
+        "properties": {
+          "custom_fields":{
+            "type": "array",
+            "items":{
+              "$ref": "#/components/schemas/CustomFieldShow"
+            }
+          }
+        }        
+      },
+      "CustomFieldShow":{
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "customized_type":{
+            "type": "string",
+            "enum": ["issue","time_entry","project","version","document","user","group","time_entry_activity","issue_priority","document_category"]
+          },
+          "field_format":{
+            "type": "string",
+            "enum": ["enumeration","string","version","attachment","user","list","link","float","int","date","bool","text"]
+          },
+          "regexp":{
+            "type": "string"
+          },
+          "min_length":{
+            "type": "integer"
+          },
+          "max_length":{
+            "type": "integer"
+          },
+          "is_required":{
+            "type": "boolean"
+          },
+          "is_filter":{
+            "type": "boolean"
+          },
+          "searchable":{
+            "type": "boolean"
+          },
+          "multiple":{
+            "type": "boolean"
+          },
+          "default_value":{
+            "type": "string"
+          },
+          "visible":{
+            "type": "boolean"
+          },
+          "possible_values":{
+            "type": "array",
+            "items":{
+              "type": "object",
+              "properties": {
+                "value":{
+                  "type": "string"
+                },
+                "label":{
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "trackers":{
+            "type": "array",
+            "items":{
+              "$ref": "#/components/schemas/IdName"
+            }
+          },
+          "roles":{
+            "type": "array",
+            "items":{
+              "$ref": "#/components/schemas/Role"
+            }
+          }
+        }        
+      },      
+      "Detail": {
+        "required": [
+          "property",
+          "name",
+          "old_value",
+          "new_value"                    
+        ],
+        "type": "object",
+        "properties": {
+          "property": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "old_value": {
+            "type": "string"
+          },        
+          "new_value": {
+            "type": "string"
+          }
+        }
+      },            
+      "Enum": {
+        "title": "Enumeration",
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "is_default"
+        ],
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "is_default": {
+            "title": "IsDefault",
+            "type": "boolean"
+          }
+        }
+      },
+      "EnumList":{
+        "type": "object",
+        "properties": {
+          "time_entry_activities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Enum"
+            }
+          },
+          "document_categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Enum"
+            }
+          },
+          "issue_priorities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Enum"
+            }
+          }
+        }        
+      },      
+      "Forbidden":{
+        "type": "object",
+        "properties": {
+          "status_code": {
+            "type": "number",
+            "example": 403,
+            "description": "Короткий идентификатор, соответствующий возвращаемому коду состояния HTTP."
+          },
+          "message": {
+            "description": "Сообщение, предоставляющее дополнительную информацию об ошибке, в том числе сведения, помогающие устранить ее, когда это возможно.",
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            ],
+            "example": "Forbidden"
+          },
+          "error_code": {
+            "type": "string",
+            "example": "forbidden",
+            "description": "Краткое описание ошибки HTTP на основе статуса."
+          }
+        },
+        "required": [
+          "status_code",
+          "error_code"
+        ]        
+      },
+      "FieldValue":{
+        "type": "object",
+        "properties": {
+          "name":{
+            "type": "string"
+          },
+          "value":{
+            "type": "string"
+          }
+        }        
+      },      
+      "Group":{
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          }
+        }        
+      },
+      "GroupList":{
+        "required": [
+          "groups"
+        ],
+        "type": "object",
+        "properties": {
+          "groups": {
+            "type":"array",
+            "items":{
+              "$ref": "#/components/schemas/Group"
+            }
+          }
+        }        
+      },      
+      "GroupNew":{
+        "type": "object",
+        "required": ["group"],
+        "properties": {
+          "group":{
+            "type": "object",
+            "required": ["name"],
+            "properties": {
+              "name":{
+                "type": "string"
+              },
+              "user_ids":{
+                "type": "array",
+                "items":{
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        }
+      },
+      "GroupShow":{
+        "type": "object",
+        "required": ["group"],
+        "description": "Returns details of a group.\nThis endpoint requires admin privileges",
+        "properties": {
+          "group":{
+            "type": "object",
+            "properties": {
+              "id":{
+                "type": "integer"
+              },
+              "name":{
+                "type": "string"
+              },
+              "users":{
+                "type": "array",
+                "items":{
+                  "$ref": "#/components/schemas/IdName"
+                }
+              },
+              "memberships":{
+                "type":"array",
+                "items":{
+                  "$ref": "#/components/schemas/MemberShip"
+                }
+              }              
+            }
+          }
+        }
+      },
+      "GroupUpdate":{
+        "type": "object",
+        "required": ["group"],
+        "properties": {
+          "group":{
+            "type": "object",
+            "required": ["name"],
+            "properties": {
+              "name":{
+                "type": "string"
+              },
+              "user_ids":{
+                "type": "array",
+                "items":{
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        }        
+      },      
+      "IdName": {
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },      
+      "Issue": {
+        "required": [
+          "id",
+          "project",
+          "tracker",
+          "status",
+          "priority",
+          "author",
+          "subject",
+          "description",
+          "start_date",
+          "due_date",
+          "done_ratio",
+          "is_private",
+          "estimated_hours",
+          "total_estimated_hours",
+          "created_on",
+          "updated_on",
+          "closed_on"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "project": {
+            "$ref": "#/components/schemas/IdName",
+            "description": "Project Id or identifier of issue’s project,maybe string"            
+          },
+          "tracker": {
+            "$ref": "#/components/schemas/IdName"
+          },
+          "status": {
+            "$ref": "#/components/schemas/IssueStatus"
+          },
+          "priority": {
+            "$ref": "#/components/schemas/IdName"
+          },
+          "author": {
+            "$ref": "#/components/schemas/IdName"
+          },
+          "assigned_to": {
+            "$ref": "#/components/schemas/IdName",
+            "description": "'ID of the user to assign the issue to (currently no mechanism to assign by name)'\n"
+          },
+          "category": {
+            "$ref": "#/components/schemas/IdName"
+          },          
+          "fixed_version": {
+            "$ref": "#/components/schemas/IdName",
+            "description": "'Оперативный план. ID of the Target Versions (previously called 'Fixed Version' and still referred to as such in the API)'\n"
+          },
+          "parent": {
+            "$ref": "#/components/schemas/IdName",
+            "description": "'ID of the parent issue'\n Name not used, need fo pascal code"
+          },  
+          "subject": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "start_date": {
+            "type": "string",
+            "description": "'Issue start date'\n"
+          },
+          "due_date": {
+            "type": "string",
+            "description": "'Issue end date'\n"
+          },                      
+          "done_ratio": {
+            "type": "integer",
+            "description": "'Issue done ratio'\n"
+          },
+          "is_private": {
+            "type": "boolean",
+            "description": "'Use true or false to indicate whether the issue is private or not'\n"
+          },
+          "estimated_hours": {
+            "type": "number",
+            "description": "'Number of hours estimated for issue'\n"
+          }, 
+          "total_estimated_hours": {
+            "type": "number",
+            "description": "'Number of hours estimated for parent issues'\n"
+          },
+          "spent_hours": {
+            "type": "number",
+            "description": "'Number of hours spent for issue'\n"
+          }, 
+          "total_spent_hours": {
+            "type": "number",
+            "description": "'Number of hours spent for parent issues'\n"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "updated_on": {
+            "type": "string"
+          },
+          "closed_on":{
+            "type": "string",
+            "description": "don't know"
+          },
+          "checklists_attributes" :{
+            "type": "array",
+            "description": "Creating issue with a checklist",
+            "items":{
+              "type": "object",
+              "properties": {
+                "is_done":{
+                  "type": "boolean"
+                },
+                "subject":{
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "children":{
+            "type": "array",
+            "items":{
+              "$ref": "#/components/schemas/Child"
+            }
+          },          
+          "attachments":{
+            "type": "array",
+            "items":{
+              "$ref": "#/components/schemas/Attachment"
+            }
+          },          
+          "relations":{
+            "type": "array",
+            "items":{
+              "$ref": "#/components/schemas/Relation"
+            }
+          },
+          "changesets":{
+            "type": "array",
+            "items":{
+              "$ref": "#/components/schemas/ChangeSet"
+            }
+          },          
+          "journals":{
+            "type": "array",
+            "items":{
+              "$ref": "#/components/schemas/Journal"
+            }
+          },
+          "watchers":{
+            "type":"array",
+            "items":{
+              "$ref": "#/components/schemas/IdName"
+            }
+          },
+          "allowed_statuses":{
+            "type":"array",
+            "items":{
+              "$ref": "#/components/schemas/IssueStatus"
+            }
+          },
+          "custom_fields": {
+            "type" : "array",
+            "items" :{
+              "$ref": "#/components/schemas/CustomField"
+            }
+          },
+          "uploads":{
+            "type": "array",
+            "items":{
+              "$ref": "#/components/schemas/Upload"
+            }
+          }
+        }
+      },
+      "IssueList":{
+        "type": "object",
+        "required": [
+          "issues"
+        ],
+        "properties": {
+          "issues": {
+            "type": "array",
+            "items": {
+              "$ref" : "#/components/schemas/Issue"
+            }
+          },
+          "offset": {
+            "type": "integer"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "total_count": {
+            "type": "integer"
+          }                    
+        }
+      },           
+      "IssueNew":{
+        "title": "New Issue Scheme",
+        "required": [
+          "issue"
+        ],
+        "type": "object",
+        "properties": {
+          "issue": {
+            "type": "object",
+            "title": "Issue",
+            "required": [
+              "project_id",
+              "subject"
+            ],
+            "properties": {
+              "project_id": {
+                "title": "ProjectId",
+                "type": "integer"
+              },
+              "tracker_id": {
+                "title": "TrackerId",
+                "type": "integer"
+              },
+              "status_id": {
+                "title": "StatusId",
+                "type": "integer"
+              },
+              "priority_id": {
+                "title": "PriorityId",
+                "type": "integer"
+              },
+              "fixed_version_id": {
+                "title": "FixedVersionId",
+                "type": "integer",
+                "description": "Оперативный план. ID of the Target Versions (previously called \"Fixed Version\" and still referred to as such in the API)"
+              },              
+              "subject": {
+                "title": "Subject",
+                "type": "string"
+              },
+              "description": {
+                "title": "Description",
+                "type": "string"
+              },
+              "category_id": {
+                "title": "CategoryId",
+                "type": "integer"
+              },
+              "assigned_to_id": {
+                "title": "AssignedToId",
+                "type": "integer",
+                "description": "ID of the user to assign the issue to (currently no mechanism to assign by name)"
+              },
+              "parent_issue_id": {
+                "title": "ParentIssueId",
+                "type": "integer",
+                "description": "ID of the parent issue"
+              },
+              "custom_fields": {
+                "title": "CustomFields",
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CustomField"
+                }
+              },
+              "watcher_user_ids": {
+                "title": "WatcherUserIds",
+                "type": "array",
+                "description": "Array of user ids to add as watchers",
+                "items": {
+                  "type": "integer"
+                }
+              },
+              "is_private": {
+                "title": "IsPrivate",
+                "type": "boolean"
+              },
+              "estimated_hours": {
+                "title": "EstimatedHours",
+                "type": "string"
+              }
+            }
+          }
+        }        
+      },
+      "IssueShow":{
+        "required": [
+          "issue"
+        ],
+        "type": "object",
+        "properties": {
+          "issue": {
+            "$ref": "#/components/schemas/Issue"
+          }
+        }        
+      },
+      "IssueUpdate":{
+        "title": "Issue Scheme",
+        "required": [
+          "issue"
+        ],
+        "type": "object",
+        "properties": {
+          "issue": {
+            "title": "Issue",
+            "type": "object",
+            "properties": {
+              "project_id": {
+                "title": "ProjectId",
+                "type": "integer"
+              },
+              "tracker_id": {
+                "title": "TrackerId",
+                "type": "integer"
+              },
+              "status_id": {
+                "title": "StatusId",
+                "type": "integer"
+              },
+              "priority_id": {
+                "title": "PriorityId",
+                "type": "integer"
+              },
+              "subject": {
+                "title": "Subject",
+                "type": "string"
+              },
+              "description": {
+                "title": "Description",
+                "type": "string"
+              },
+              "start_date":{
+                "type": "string"
+              },
+              "due_date":{
+                "type": "string"
+              },
+              "done_ratio":{
+                "type": "integer"
+              },
+              "category_id": {
+                "title": "CategoryId",
+                "type": "integer"
+              },
+              "fixed_version_id": {
+                "title": "FixedVersionId",
+                "type": "integer",
+                "description": "Оперативный план. ID of the Target Versions (previously called \"Fixed Version\" and still referred to as such in the API)"
+              },
+              "assigned_to_id": {
+                "title": "AssignedToId",
+                "type": "integer",
+                "description": "ID of the user to assign the issue to (currently no mechanism to assign by name)"
+              },
+              "parent_issue_id": {
+                "title": "ParentIssueId",
+                "type": "integer",
+                "description": "ID of the parent issue"
+              },
+              "custom_fields": {
+                "title": "CustomFields",
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CustomField"
+                }
+              },
+              "watcher_user_ids": {
+                "title": "WatcherUserIds",
+                "type": "array",
+                "description": "Array of user ids to add as watchers",
+                "items": {
+                  "type": "integer"
+                }
+              },
+              "is_private": {
+                "title": "IsPrivate",
+                "type": "boolean"
+              },
+              "estimated_hours": {
+                "title": "EstimatedHours",
+                "type": "number"
+              },
+              "notes": {
+                "title": "Notes",
+                "description": "Comments about the update",
+                "type": "string"
+              },
+              "private_notes": {
+                "title": "PrivateNotes",
+                "description": "true if notes are private",
+                "type": "boolean"
+              },
+              "uploads":{
+                "$ref": "#/components/schemas/UploadList"
+              }
+            }
+          }
+        }        
+      },      
+      "IssueStatus":{
+        "title": "IssueStatus",
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "is_closed"
+        ],
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "is_closed": {
+            "title": "IsClosed",
+            "type": "boolean"
+          },
+          "description":{
+            "type": "string"
+          }          
+        }
+      },
+      "IssueStatusesList":{
+        "required": [
+          "issue_statuses"
+        ],
+        "type": "object",
+        "properties": {
+          "issue_statuses":{
+            "type": "array",
+            "items":{
+              "$ref": "#/components/schemas/IssueStatus"
+            }
+          }
+        }        
+      },      
+      "IssueCategory":{
+        "type": "object",
+        "required": [
+          "id",
+          "project",
+          "name"
+        ],
+        "properties": {
+          "id":{
+            "type": "integer"
+          },
+          "project":{
+            "$ref": "#/components/schemas/IdName"
+          },
+          "name":{
+            "type": "string"
+          },
+          "assigned_to":{
+            "$ref": "#/components/schemas/IdName"
+          }
+        }
+      },
+      "IssueCategoryList":{
+        "type": "object",
+        "required": ["issue_categories"],
+        "properties": {
+          "issue_categories":{
+            "type": "array",
+            "items":{
+              "$ref": "#/components/schemas/IssueCategory"
+            }
+          },
+          "total_count":{
+            "type": "integer"
+          }
+        }        
+      },
+      "IssueCategoryShow":{
+        "type": "object",
+        "required": ["issue_category"],
+        "properties": {
+          "issue_category":{
+            "type": "object",
+            "required": [
+              "id",
+              "project",
+              "name"
+            ],
+            "properties": {
+              "id":{
+                "type": "integer"
+              },
+              "project":{
+                "$ref": "#/components/schemas/IdName"
+              },
+              "name":{
+                "type": "string"
+              },
+              "assigned_to":{
+                "$ref": "#/components/schemas/IdName"                
+              }              
+            }
+          }
+        }    
+      },
+      "IssueCategoryUpdate":{
+        "type": "object",
+        "required":[
+          "issue_category"
+        ],
+        "properties": {
+          "issue_category":{
+            "type":"object",
+            "required": ["name"],
+            "properties": {
+              "name":{
+                "type": "string"
+              },
+              "assigned_to":{
+                "description":"the id of the user assigned to the category (new issues with this category are assigned by default to this user)"
+              }
+            }          
+          }
+        }       
+      },      
+      "IssueCategoryNew":{
+        "type": "object",
+        "required":[
+          "issue_category"
+        ],
+        "properties": {
+          "issue_category":{
+            "type":"object",
+            "required": ["name"],
+            "properties": {
+              "name":{
+                "type": "string"
+              },
+              "assigned_to":{
+                "description":"the id of the user assigned to the category (new issues with this category are assigned by default to this user)"
+              }
+            }          
+          }
+        }
+      },      
+      "Journal": {
+        "required": [
+          "id",
+          "user",
+          "notes",
+          "created_on",
+          "details"                    
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "user": {
+            "$ref": "#/components/schemas/IdName"
+          },
+          "notes":{
+            "type": "string"
+          },
+          "created_on":{
+            "type": "string"
+          },
+          "updated_on":{
+            "type": "string"
+          },
+          "updated_by":{
+            "description":"Setting the target version to 6.0.0.",
+            "$ref": "#/components/schemas/IdName"
+          },          
+          "private_notes":{
+            "type": "boolean"
+          },          
+          "details":{
+            "type": "array",
+            "items":{
+              "$ref":"#/components/schemas/Detail"
+            }
+          }
+        }
+      },      
+      "JournalUpdate":{
+        "type": "object",
+        "properties": {
+          "journal":{
+            "type": "object",
+            "properties": {
+              "notes":{
+                "type": "string"
+              },
+              "private_notes":{
+                "type": "boolean"
+              }
+            }
+          }
+        }        
+      },      
+      "MemberShip":{
+        "type": "object",
+        "required": [
+          "id",
+          "project",
+          "roles"
+        ],
+        "properties": {
+          "id":{
+            "type": "integer"
+          },
+          "project": {
+            "$ref": "#/components/schemas/IdName"
+          },
+          "user":{
+            "$ref": "#/components/schemas/IdName"
+          },
+          "group":{
+            "$ref": "#/components/schemas/IdName"
+          },           
+          "roles":{
+            "type": "array",
+            "items":{
+              "$ref": "#/components/schemas/RoleMini"
+            }
+          }
+        }
+      },
+      "MemberShipList":{
+        "type": "object",
+        "required": ["memberships"],
+        "properties": {
+          "memberships":{
+            "type": "array",
+            "items":{
+              "$ref": "#/components/schemas/MemberShip"
+            }                    
+          },
+          "total_count":{
+            "type": "integer"
+          },
+          "offset":{
+            "type": "integer"
+          },
+          "limit":{
+            "type": "integer"
+          }
+        }
+      },
+      "MemberShipUpdate":{
+        "type": "object",
+        "properties": {
+          "memberships":{
+            "type": "object",
+            "required": [
+              "role_ids"
+            ],
+            "properties": {
+              "role_ids":{
+                "type": "array",
+                "description": "an array of roles numerical ids",
+                "items":{
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        }                
+      },
+      "MemberShipAdd":{
+        "type": "object",
+        "required": [
+          "membership"
+        ],
+        "properties": {
+          "memberships":{
+            "type": "object",
+            "required": [
+              "user_id",
+              "role_ids"
+            ],
+            "properties": {
+              "user_id":{
+                "type": "integer",
+                "description": "the numerical id of the user or group"
+              },
+              "role_ids":{
+                "type": "array",
+                "description": "an array of roles numerical ids",
+                "items":{
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        }        
+      },
+      "MemberShipShow":{
+        "type": "object",
+        "required": [
+          "membership"
+        ],
+        "properties": {
+          "memberships":{
+            "type": "object",
+            "required": [
+              "id",
+              "project",
+              "roles"
+            ],
+            "properties": {
+              "id":{
+                "type": "integer",
+                "description": "the numerical id of the user or group"
+              },
+              "project":{
+                "$ref": "#/components/schemas/IdName"
+              },
+              "user":{
+                "$ref": "#/components/schemas/IdName"
+              },
+              "group":{
+                "$ref": "#/components/schemas/IdName"
+              },    
+              "roles":{
+                "type":"array",
+                "items":{
+                  "$ref": "#/components/schemas/IdName"
+                }
+              }
+            }
+          }
+        }         
+      },
+      "NotAuthorized":{
+        "type": "object",
+        "properties": {
+          "status_code": {
+            "type": "number",
+            "description": "Короткий идентификатор, соответствующий возвращаемому коду состояния HTTP.",
+            "example": 401
+          },
+          "message": {
+            "description": "Сообщение, предоставляющее дополнительную информацию об ошибке, в том числе сведения, помогающие устранить ее, когда это возможно.",
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            ],
+            "example": "Unauthorized"
+          },
+          "error_code": {
+            "type": "string",
+            "example": "unauthorized",
+            "description": "Краткое описание ошибки HTTP на основе статуса."
+          }
+        },
+        "required": [
+          "status_code",
+          "error_code"
+        ]        
+      },
+      "UnknownError":{
+        "type": "object",
+        "required": [
+          "errors"
+        ],
+        "properties": {
+          "errors": {
+            "description": "",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }         
+      },
+      "Project":{
+        "type": "object",
+        "title": "Project",
+        "required": [
+          "id",
+          "name",
+          "identifier",
+          "description",
+          "status",
+          "is_public",
+          "inherit_members",
+          "created_on",
+          "updated_on"
+        ],
+        "properties": {
+          "id":{
+            "type": "integer"
+          },
+          "name":{
+            "type": "string"
+          },
+          "identifier":{
+            "type": "string"
+          },
+          "description":{
+            "type": "string"
+          },
+          "homepage":{
+            "type": "string"
+          },
+          "parent":{
+            "$ref": "#/components/schemas/IdName"
+          },
+          "status":{
+            "type": "integer",
+            "description":"1: status active, 5: status closed, 9: status archived"
+          },
+          "is_public":{
+            "type": "boolean"
+          },
+          "inherit_members":{
+            "type": "boolean"
+          },
+          "custom_fields":{
+            "type": "array",
+            "items":{
+              "$ref": "#/components/schemas/CustomField"
+            }
+          },
+          "trackers":{
+            "type": "array",
+            "items":{
+              "$ref": "#/components/schemas/IdName"
+            }  
+          },
+          "issue_categories":{
+            "type": "array",
+            "items":{
+              "$ref": "#/components/schemas/IdName"
+            } 
+          },
+          "time_entry_activities":{
+            "type": "array",
+            "items":{
+              "$ref": "#/components/schemas/IdName"
+            }  
+          },
+          "enabled_modules":{
+            "type": "array",
+            "items":{
+              "$ref": "#/components/schemas/IdName"
+            }  
+          },
+          "issue_custom_fields":{
+            "type": "array",
+            "items":{
+              "$ref": "#/components/schemas/IdName"
+            }  
+          },
+          "created_on":{
+            "type": "string"
+          },
+          "updated_on":{
+            "type": "string"
+          }
+        }
+      },
+      "ProjectList":{
+        "type": "object",
+        "required": [
+          "projects"
+        ],
+        "properties": {
+          "projects": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Project"
+            }
+          },
+          "total_count": {
+            "type": "integer"
+          },
+          "offset": {
+            "type": "integer"
+          },
+          "limit": {
+            "type": "integer"
+          }
+        }                
+      },
+      "ProjectShow":{
+        "required": [
+          "project"
+        ],
+        "type": "object",
+        "properties": {
+          "project": {
+            "title": "Project",
+            "required": [
+              "id",
+              "name",
+              "identifier",
+              "description",
+              "status",
+              "is_public",
+              "inherit_members",
+              "created_on",
+              "updated_on"
+            ],
+            "properties": {
+              "id":{
+                "type": "integer"
+              },
+              "name":{
+                "type": "string"
+              },
+              "identifier":{
+                "type": "string"
+              },
+              "description":{
+                "type": "string"
+              },
+              "homepage":{
+                "type": "string"
+              },
+              "parent":{
+                "$ref": "#/components/schemas/IdName"
+              },
+              "status":{
+                "type": "integer",
+                "description":"1: status active, 5: status closed, 9: status archived"
+              },
+              "is_public":{
+                "type": "boolean"
+              },
+              "inherit_members":{
+                "type": "boolean"
+              },
+              "default_version":{
+                "$ref": "#/components/schemas/IdName"
+              },
+              "default_assignee":{
+                "$ref": "#/components/schemas/IdName"
+              },
+              "custom_fields":{
+                "type": "array",
+                "items":{
+                  "$ref": "#/components/schemas/CustomField"
+                }
+              },
+              "trackers":{
+                "type": "array",
+                "items":{
+                  "$ref": "#/components/schemas/IdName"
+                }  
+              },
+              "issue_categories":{
+                "type": "array",
+                "items":{
+                  "$ref": "#/components/schemas/IdName"
+                }  
+              },
+              "time_entry_activities":{
+                "type": "array",
+                "items":{
+                  "$ref": "#/components/schemas/IdName"
+                }  
+              },
+              "enabled_modules":{
+                "type": "array",
+                "items":{
+                  "$ref": "#/components/schemas/IdName"
+                }  
+              },
+              "issue_custom_fields":{
+                "type": "array",
+                "items":{
+                  "$ref": "#/components/schemas/IdName"
+                }  
+              },
+              "created_on":{
+                "type": "string",
+                "format": "date-time"
+              },
+              "updated_on":{
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }  
+        }          
+      },
+      "ProjectNew":{
+        "title": "Project Scheme",
+        "required": [
+          "project"
+        ],
+        "type": "object",
+        "properties": {
+          "project": {
+            "title": "Project",
+            "required": [
+              "name",
+              "identifier"
+            ],
+            "properties": {
+              "name":{
+                "type": "string"
+              },
+              "identifier":{
+                "type": "string"
+              },
+              "description":{
+                "type": "string"
+              },
+              "homepage":{
+                "type": "string"
+              },
+              "is_public":{
+                "type": "boolean"
+              },
+              "parent_id":{
+                "type": "integer",
+                "description": "the parent project number"
+              },
+              "inherit_members":{
+                "type": "boolean",
+                "description": "true or false"
+              },
+              "default_assigned_to_id":{
+                "type": "integer",
+                "description": "ID of the default user. It works only when the new project is a subproject and it inherits the members."
+              },
+              "default_version_id":{
+                "type": "integer",
+                "description": " ID of the default version. It works only with existing shared versions."
+              },
+              "tracker_ids":{
+                "type": "array",
+                "description": " (repeatable element) the tracker id: 1 for Bug, etc.",
+                "items":{
+                  "type": "integer"
+                }
+              },
+              "enabled_module_names":{
+                "type": "array",
+                "description": "(repeatable element) the module name: boards, calendar, documents, files, gantt, issue_tracking, news, repository, time_tracking, wiki.",
+                "items":{
+                  "type": "string",
+                  "enum": ["boards", "calendar", "documents", "files", "gantt", "issue_tracking", "news", "repository", "time_tracking", "wiki"]
+                }
+              },
+              "issue_custom_field_ids":{
+                "type": "array",
+                "description": "(repeatable element) issue custom field id.",
+                "items":{
+                  "type": "integer"
+                }
+              },
+              "custom_fields":{
+                "type": "array",
+                "items":{
+                  "$ref": "#/components/schemas/IdName"
+                }  
+              },
+              "custom_field_values":{
+                "$ref": "#/components/schemas/FieldValue"
+              }              
+            }
+          }
+        }        
+      },
+      "ProjectUpdate":{
+        "title": "Project Scheme",
+        "required": [
+          "project"
+        ],
+        "type": "object",
+        "properties": {
+          "project": {
+            "title": "Project",
+            "required": [
+              "name"
+            ],
+            "properties": {
+              "name":{
+                "type": "string"
+              },
+              "description":{
+                "type": "string"
+              },
+              "homepage":{
+                "type": "string"
+              },
+              "is_public":{
+                "type": "boolean"
+              },
+              "parent_id":{
+                "type": "integer"
+              },
+              "inherit_members":{
+                "type": "boolean"
+              },
+              "default_assigned_to_id":{
+                "type": "integer"
+              },
+              "default_version_id":{
+                "type": "integer"
+              },
+              "tracker_ids":{
+                "type": "array",
+                "items":{
+                  "type": "integer"
+                }
+              },
+              "enabled_module_names":{
+                "type": "array",
+                "items":{
+                  "type": "string"
+                }
+              },
+              "issue_custom_field_ids":{
+                "type": "array",
+                "items":{
+                  "type": "integer"
+                }
+              },
+              "custom_fields":{
+                "type": "array",
+                "items":{
+                  "$ref": "#/components/schemas/CustomField"
+                }
+              },
+              "custom_field_values":{
+                "$ref": "#/components/schemas/FieldValue"
+              }
+            }
+          }
+        }        
+      },
+      "ResNotFound":{
+        "type": "object",
+        "properties": {
+          "status_code": {
+            "type": "number",
+            "example": 404,
+            "description": "Короткий идентификатор, соответствующий возвращаемому коду состояния HTTP."
+          },
+          "message": {
+            "description": "Сообщение, предоставляющее дополнительную информацию об ошибке, в том числе сведения, помогающие устранить ее, когда это возможно.",
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            ],
+            "example": "Resource not found"
+          },
+          "error_code": {
+            "type": "string",
+            "example": "not_found",
+            "description": "Краткое описание ошибки HTTP на основе статуса."
+          }
+        },
+        "required": [
+          "status_code",
+          "error_code"
+        ]        
+      }, 
+      "Query":{
+        "type": "object",
+        "properties": {
+          "id":{
+            "type": "integer"
+          },
+          "name":{
+            "type": "string"
+          },
+          "is_public":{
+            "type": "string"
+          },
+          "project_id":{
+            "type": "integer"
+          }
+        }        
+      },
+      "QueriesList":{
+        "type": "object",
+        "required": [
+          "queries"
+        ],
+        "properties": {
+          "queries":{
+            "type": "array",
+            "items":{
+              "$ref": "#/components/schemas/Query"
+            }
+          },
+          "total_count":{
+            "type": "integer"
+          },
+          "limit":{
+            "type": "integer"
+          },
+          "offset":{
+            "type": "integer"
+          }
+        }          
+      },      
+      "Relation":{
+        "required": [
+          "id",
+          "issue_id",
+          "issue_to_id",
+          "relation_type",
+          "delay"
+        ],
+        "type": "object",
+        "properties": {
+          "id":{
+            "type": "integer"
+          },
+          "issue_id":{
+            "type": "integer"
+          },
+          "issue_to_id":{
+            "type": "integer",
+            "description": " the id of the related issue"
+          },
+          "relation_type":{
+            "type": "string",
+            "enum": ["relates","duplicates","duplicated","blocks","blocked","precedes","follows","copied_to","copied_from"],
+            "default" : "relates"
+          },
+          "delay":{
+            "type": "integer",
+            "description": "'the delay for a 'precedes' or 'follows' relation'"
+          },
+          "empty":{
+            "type": "string",
+            "description": "for rtti"
+          }
+        }        
+      },
+      "RelationList":{
+        "type": "object",
+        "required": ["relations"],
+        "properties": {
+          "relations":{
+            "type": "array",
+            "items":{
+              "$ref": "#/components/schemas/Relation"
+            }
+          }
+        }        
+      },
+      "RelationNew":{
+        "type": "object",
+        "required": [
+          "relation"
+        ],
+        "properties": {
+          "relation":{
+            "type": "object",
+            "required": ["issue_to_id","relation_type"],
+            "properties": {
+              "issue_to_id":{
+                "type": "integer",
+                "description": " the id of the related issue"
+              },
+              "relation_type":{
+                "type": "string",
+                "enum": ["relates","duplicates","duplicated","blocks","blocked","precedes","follows","copied_to","copied_from"],
+                "default" : "relates"
+              },
+              "delay":{
+                "type": "integer",
+                "description": "'the delay for a 'precedes' or 'follows' relation'"
+              },
+              "empty":{
+                "type": "string",
+                "description": "for rtti"
+              }              
+            }
+          }
+        }        
+      },
+      "RelationShow":{
+        "type": "object",
+        "required": [
+          "relation"
+        ],  
+        "properties":{
+          "relation":{
+            "$ref": "#/components/schemas/Relation"
+          }
+        }
+      },            
+      "RoleMini": {
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "inherited":{
+            "type": "boolean"
+          }
+        }
+      },
+      "Role": {
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "assignable":{
+            "type": "boolean"
+          },
+          "issues_visibility":{
+            "type": "string"
+          },
+          "time_entries_visibility":{
+            "type": "string"
+          },
+          "users_visibility":{
+            "type": "string"
+          },
+          "permissions":{
+            "type": "array",
+            "items":{
+              "type": "string"
+            }
+          }
+        }
+      },
+      "RolesList":{
+        "type": "object",
+        "required": ["roles"],
+        "properties": {
+          "roles":{
+            "type": "array",
+            "items":{
+              "$ref": "#/components/schemas/IdName"
+            }
+          }
+        }        
+      },
+      "RoleShow": {
+        "type": "object",
+        "required": ["role"],
+        "properties": {
+          "role":{
+            "type": "object",
+            "required": [
+              "id",
+              "name"
+            ],
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "name": {
+                "type": "string"
+              },
+              "assignable":{
+                "type": "boolean"
+              },
+              "issues_visibility":{
+                "type": "string"
+              },
+              "time_entries_visibility":{
+                "type": "string"
+              },
+              "users_visibility":{
+                "type": "string"
+              },
+              "permissions":{
+                "type": "array",
+                "items":{
+                  "type": "string"
+                }
+              }
+            }            
+          }
+        }
+      },
+      "UserAdd":{
+        "required": [
+          "user_id"
+        ],                
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "integer",
+            "description": "id of the user to add as a watcher"
+          },
+          "name":{
+            "type": "string",
+            "description": "empty for rtti"
+          }
+        }        
+      },
+      "User": {
+        "required": [
+          "id",
+          "login",
+          "admin",
+          "firstname",
+          "lastname",
+          "mail",
+          "created_on",
+          "updated_on",
+          "last_login_on",
+          "passwd_changed_on",
+          "twofa_scheme"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "login": {
+            "type": "string"
+          },
+          "admin": {
+            "type": "boolean"
+          },
+          "firstname": {
+            "type": "string"
+          },
+          "lastname": {
+            "type": "string"
+          },
+          "mail": {
+            "type": "string"
+          },
+          "created_on": {
+            "type": "string"
+          },
+          "updated_on": {
+            "type": "string"
+          },
+          "last_login_on": {
+            "type": "string"
+          },
+          "passwd_changed_on": {
+            "type": "string"
+          }, 
+          "twofa_scheme":{
+            "type": "object"
+          },         
+          "custom_fields":{
+            "type": "array",
+            "items":{
+              "$ref": "#/components/schemas/CustomField"
+            }
+          }
+        }
+      },
+      "UserList":{
+        "type": "object",
+        "required": [
+          "users"
+        ],
+        "properties": {
+          "users": {
+            "title": "Users",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/User"
+            }
+          },
+          "total_count":{
+            "type": "integer"
+          },
+          "offset":{
+            "type": "integer"
+          },
+          "limit":{
+            "type": "integer"
+          }
+        }        
+      },
+      "UserShow": {
+        "required": [
+          "user"
+        ],
+        "type": "object",
+        "properties": {
+          "user": {
+            "type": "object",
+            "required": [
+              "id",
+              "login",
+              "admin",
+              "firstname",
+              "lastname",
+              "mail",
+              "created_on",
+              "updated_on",
+              "last_login_on",
+              "passwd_changed_on",
+              "twofa_scheme",
+              "api_key",
+              "status"
+            ],
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "login": {
+                "type": "string"
+              },
+              "admin": {
+                "type": "boolean"
+              },
+              "firstname": {
+                "type": "string"
+              },
+              "lastname": {
+                "type": "string"
+              },
+              "mail": {
+                "type": "string"
+              },
+              "created_on": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "updated_on": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "last_login_on": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "passwd_changed_on": {
+                "type": "string",
+                "format": "date-time"
+              }, 
+              "twofa_scheme":{
+                "type": "object"
+              },         
+              "api_key": {
+                "description": "the API key of the user, visible for admins and for yourself ",
+                "type": "string"
+              },
+              "status":{
+                "description": "a numeric id representing the status of the user, visible for admins only (added in 2.4.0). STATUS_ANONYMOUS = 0; STATUS_ACTIVE=1; STATUS_REGISTERED=2; STATUS_LOCKED=3",
+                "type": "integer"
+              },
+              "custom_fields":{
+                "type": "array",
+                "items":{
+                  "$ref": "#/components/schemas/CustomField"
+                }
+              },
+              "groups":{
+                "description": "if include groups",
+                "type": "array",
+                "items":{
+                  "$ref": "#/components/schemas/Group"
+                }            
+              },
+              "memberships":{
+                "description": "if include memberships",
+                "type": "array",
+                "items":{
+                  "$ref": "#/components/schemas/MemberShip"
+                }  
+              }
+            }
+          }
+        }
+      },
+      "UserUpdate":{
+        "type": "object",
+        "required": ["user"],
+        "properties": {
+          "user":{
+            "type": "object",
+            "properties": {
+              "login":{
+                "type": "string"
+              },
+              "admin":{
+                "type": "boolean"
+              },
+              "password":{
+                "type": "string"
+              },
+              "firstname":{
+                "type": "string"
+              },
+              "lastname":{
+                "type": "string"
+              },
+              "mail":{
+                "type": "string"
+              },
+              "language":{
+                "type": "string"
+              },
+              "auth_source_id":{
+                "type": "integer"
+              },
+              "mail_notification":{
+                "type": "string",
+                "enum": ["all","selected","only_my_events","only_assigned","only_owner","none"]
+              },
+              "notified_project_ids":{
+                "type": "array",
+                "items":{
+                  "type": "integer"
+                }
+              },
+              "must_change_passwd":{
+                "type": "boolean"
+              },
+              "generate_password":{
+                "type": "boolean"
+              },
+              "status":{
+                "type": "integer"
+              },
+              "custom_fields":{
+                "type": "array",
+                "items":{
+                  "$ref": "#/components/schemas/CustomField"
+                }
+              },
+              "custom_field_values":{
+                "$ref": "#/components/schemas/FieldValue"
+              },
+              "group_ids":{
+                "type": "array",
+                "items":{
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "send_information":{
+            "type": "boolean"
+          },
+          "custom_fields":{
+            "type": "array",
+            "items":{
+              "$ref": "#/components/schemas/CustomField"
+            }
+          },
+          "pref":{
+            "type": "object",
+            "properties": {
+              "hide_mail":{
+                "type": "boolean"
+              },
+              "time_zone":{
+                "type": "string"
+              },
+              "comments_sorting":{
+                "type": "string",
+                "enum": ["asc","desc"]
+              },
+              "warn_on_leaving_unsaved":{
+                "type": "boolean"
+              },
+              "no_self_notified":{
+                "type": "boolean"
+              },
+              "notify_about_high_priority_issues":{
+                "type": "boolean"
+              },
+              "textarea_font":{
+                "type": "string",
+                "enum": ["monospace","proportional"]
+              },
+              "recently_used_projects":{
+                "type": "integer"
+              },
+              "history_default_tab":{
+                "type": "string",
+                "enum": ["notes","history","properties","time_entries","changesets","last_tab_visited"]
+              },
+              "toolbar_language_options":{
+                "type": "string"
+              },
+              "default_issue_query":{
+                "type": "integer"
+              },
+              "default_project_query":{
+                "type": "integer"
+              },
+              "auto_watch_on":{
+                "type": "string",
+                "default":"issue_contributed_to"
+              }
+            }
+          }
+        }        
+      },      
+      "UserNew":{
+        "title": "User Scheme",
+        "required": [
+          "user"
+        ],
+        "type": "object",
+        "properties": {
+          "user": {
+            "type": "object",
+            "title": "User",
+            "required": [
+              "login",
+              "firstname",
+              "lastname",
+              "mail"
+            ],
+            "properties": {
+              "login": {
+                "type": "string"
+              },
+              "admin":{
+                "type": "boolean"
+              },
+              "password": {
+                "type": "string"
+              },
+              "firstname": {
+                "type": "string"
+              },
+              "lastname": {
+                "type": "string"
+              },
+              "mail": {
+                "type": "string"
+              },
+              "language":{
+                "type": "string"
+              },
+              "auth_source_id": {
+                "title": "authentication mode id",
+                "type": "integer"
+              },
+              "mail_notification": {
+                "description": "only_my_events, none, etc.",
+                "type": "string",
+                "enum": ["all","selected","only_my_events","only_assigned","only_owner","none"],
+                "default":"only_my_events"
+              },
+              "notified_project_ids":{
+                "type": "array",
+                "items":{
+                  "type": "integer"
+                }
+              },
+              "must_change_passwd": {
+                "type": "boolean"
+              },
+              "generate_password": {
+                "type": "boolean"
+              },
+              "status":{
+                "type": "integer"
+              },
+              "custom_fields": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CustomField"
+                }
+              },
+              "custom_field_values":{
+                "$ref": "#/components/schemas/FieldValue"
+              }
+            }
+          },
+          "send_information":{
+            "type":"boolean",
+            "description": "Send account information to the user"
+          },
+          "pref":{
+            "type": "object",
+            "properties": {
+              "hide_mail":{
+                "type": "boolean"
+              },
+              "time_zone":{
+                "type": "string"
+              },
+              "comments_sorting":{
+                "type": "string",
+                "enum": ["asc","desc"]
+              },
+              "warn_on_leaving_unsaved":{
+                "type": "boolean"
+              },
+              "no_self_notified":{
+                "type": "boolean"
+              },
+              "notify_about_high_priority_issues":{
+                "type": "boolean"
+              },
+              "textarea_font":{
+                "type": "string",
+                "enum": ["monospace","proportional"]
+              },
+              "recently_used_projects":{
+                "type": "integer"
+              },
+              "history_default_tab":{
+                "type": "string",
+                "enum": ["notes","history","properties","time_entries","changesets","last_tab_visited"]
+              },
+              "toolbar_language_options":{
+                "type": "string"
+              },
+              "default_issue_query":{
+                "type": "integer"
+              },
+              "default_project_query":{
+                "type": "integer"
+              },
+              "auto_watch_on":{
+                "type": "string",
+                "default":"issue_contributed_to"
+              }
+            }
+          }                  
+        }        
+      },
+      "ValidationError":{
+        "type": "object",
+        "required": [
+          "errors"
+        ],
+        "properties": {
+          "errors": {
+            "description": "",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }        
+      },
+      "Version":{
+        "type": "object",
+        "required": [
+          "id",
+          "project",
+          "name",
+          "description",
+          "status",
+          "due_date",
+          "sharing",
+          "wiki_page_title",
+          "created_on",
+          "updated_on"
+        ],
+        "properties": {
+          "id":{
+            "type": "integer"
+          },
+          "project":{
+            "$ref": "#/components/schemas/IdName"
+          },
+          "name":{
+            "type": "string"
+          },
+          "description":{
+            "type": "string",
+            "default":""
+          },
+          "status":{
+            "type": "string",
+            "enum": ["open","locked","closed"]
+          },
+          "due_date":{
+            "type": "string"
+          },
+          "sharing":{
+            "type": "string",
+            "enum": ["none","descendants","hierarchy","tree","system"],
+            "default":"none"
+          },
+          "wiki_page_title":{
+            "type": "string"
+          },
+          "custom_fields":{
+            "type":"array",
+            "items":{
+              "$ref": "#/components/schemas/CustomField"
+            }
+          },
+          "created_on":{
+            "type": "string"
+          },
+          "updated_on":{
+            "type": "string"
+          }          
+        }
+      },
+      "VersionNew":{
+        "type": "object",
+        "required": ["version"],
+        "properties": {
+          "version":{
+            "type": "object",
+            "required": ["name"],
+            "properties": {
+              "name":{
+                "type": "string"
+              },
+              "status":{
+                "type": "string",
+                "enum": ["open","locked","closed"],
+                "default":"open"
+              },
+              "sharing":{
+                "type": "string",
+                "enum": ["none","descendants","hierarchy","tree","system"],
+                "default":"none"
+              },
+              "due_date":{
+                "type": "string",
+                "format": "date"
+              },
+              "description":{
+                "type": "string"
+              },
+              "wiki_page_title":{
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "VersionUpdate":{
+        "type": "object",
+        "required": ["version"],
+        "properties": {
+          "version":{
+            "type": "object",
+            "required": ["name"],
+            "properties": {
+              "name":{
+                "type": "string"
+              },
+              "status":{
+                "type": "string",
+                "enum": ["open","locked","closed"],
+                "default":"open"
+              },
+              "sharing":{
+                "type": "string",
+                "enum": ["none","descendants","hierarchy","tree","system"],
+                "default":"none"
+              },
+              "due_date":{
+                "type": "string",
+                "format": "date"
+              },
+              "description":{
+                "type": "string"
+              },
+              "wiki_page_title":{
+                "type": "string"
+              }
+            }
+          }
+        }
+      },      
+      "VersionShow":{
+        "type": "object",
+        "required": ["version"],
+        "properties": {
+          "version":{
+            "type": "object",
+            "required": [
+              "id",
+              "project",
+              "name",
+              "description",
+              "status",
+              "due_date",
+              "sharing",
+              "wiki_page_title",
+              "created_on",
+              "updated_on"
+            ],
+            "properties": {
+              "id":{
+                "type": "integer"
+              },
+              "project":{
+                "$ref":"#/components/schemas/IdName"
+              },
+              "name":{
+                "type": "string"
+              },
+              "description":{
+                "type": "string"
+              },
+              "status":{
+                "type": "string",
+                "enum": ["open","locked","closed"]
+              },
+              "due_date":{
+                "type": "string",
+                "format": "date"
+              },
+              "sharing":{
+                "type": "string",
+                "enum": ["none","descendants","hierarchy","tree","system"]
+              },
+              "wiki_page_title":{
+                "type": "string"
+              },
+              "estimated_hours":{
+                "type": "number"
+              },
+              "spent_hours":{
+                "type": "number"
+              },
+              "created_on":{
+                "type": "string",
+                "format": "date-time"
+              },
+              "updated_on":{
+                "type": "string",
+                "format": "date-time"
+              },
+              "custom_fields":{
+                "type": "array",
+                "items":{
+                  "$ref": "#/components/schemas/CustomField"
+                }
+              }
+            }
+          }
+        }
+      },
+      "VersionList":{
+        "type": "object",
+        "required": ["versions"],
+        "properties": {
+          "versions":{
+            "type": "array",
+            "items":{
+              "$ref": "#/components/schemas/Version"
+            }
+          },
+          "total_count":{
+            "type": "integer"
+          }
+        }        
+      },
+      "TimeEntryShow": {
+        "type": "object",
+        "title": "TimeEntry",
+        "required": [
+          "id",
+          "user",
+          "activity",
+          "hours",
+          "comments",
+          "spent_on",
+          "created_on",
+          "updated_on"
+        ],
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "project": {
+            "title": "Project",
+            "$ref": "#/components/schemas/IdName"
+          },
+          "issue": {
+            "title": "Issue",
+            "$ref": "#/components/schemas/IdName"
+          },
+          "user": {
+            "title": "User",
+            "$ref": "#/components/schemas/IdName"            
+          },
+          "activity": {
+            "title": "Activity",
+            "$ref": "#/components/schemas/IdName"            
+          },
+          "hours": {
+            "title": "Hours",
+            "type": "number"
+          },
+          "comments": {
+            "title": "Comments",
+            "type": "string"
+          },
+          "spent_on": {
+            "title": "SpentOn",
+            "type": "string"
+          },
+          "created_on": {
+            "title": "CreatedOn",
+            "type": "string"
+          },
+          "updated_on": {
+            "title": "UpdatedOn",
+            "type": "string"
+          },
+          "custom_fields":{
+            "type": "array",
+            "items":{
+              "$ref": "#/components/schemas/CustomField"
+            }
+          }
+        }
+      },
+      "TimeList":{
+        "type": "object",
+        "required": [
+          "time_entries"
+        ],
+        "properties": {
+          "time_entries": {
+            "type": "array",
+            "title": "TimeEntries",
+            "items": {
+              "$ref": "#/components/schemas/TimeEntryShow"
+            }
+          },
+          "total_count": {
+            "type":"integer"
+          },
+          "offset": {
+            "type":"integer"
+          },
+          "limit": {
+            "type":"integer"
+          }
+        }        
+      },
+      "TimeShow":{
+        "type": "object",
+        "required": ["time_entry"],
+        "properties": {
+          "time_entry":{
+            "$ref": "#/components/schemas/TimeEntryShow"
+          }
+        }
+      },
+      "TimeEntryNewUpdate":{
+        "title": "Time Entry",
+        "required": [
+          "hours"
+        ],
+        "type": "object",
+        "properties": {
+          "issue_id": {
+            "title": "IssueId",
+            "type": "integer",
+            "description": "the issue id to log time on (only one id is required).the issue id or project id to log time on (both are integers)"
+          },
+          "project_id": {
+            "title": "ProjectId",
+            "type": "integer",
+            "description": "the project id to log time on (only one id is required).the issue id or project id to log time on (both are integers)"
+          },
+          "spent_on": {
+            "title": "SpentOn",
+            "type": "string",
+            "description": "the date the time was spent (default to the current date); format is e.g. 2020-12-24"
+          },
+          "hours": {
+            "title": "Hours",
+            "type": "number",
+            "description": "the number of spent hours"
+          },
+          "activity_id": {
+            "title": "ActivityId",
+            "type": "integer",
+            "description": "the id of the time activity. This parameter is required unless a default activity is defined in Redmine."
+          },
+          "comments": {
+            "title": "Comments",
+            "type": "string",
+            "description": "short description for the entry (255 characters max)"
+          },
+          "user_id": {
+            "title": "UserId",
+            "type": "integer",
+            "description": "user id to be specified in need of posting time on behalf of another user"
+          },
+          "custom_fields":{
+            "type": "array",
+            "items":{
+              "$ref": "#/components/schemas/CustomField"
+            }
+          }
+        }
+      },
+      "TimeNewUpdate":{
+        "title": "Time entry Schema",
+        "type": "object",
+        "required": [
+          "time_entry"
+        ],                
+        "properties": {
+          "time_entry": {
+            "$ref": "#/components/schemas/TimeEntryNewUpdate"
+          }
+        }        
+      },
+      "Tracker": {
+        "title": "Tracker",
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "default_status"
+        ],
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "default_status": {
+            "title": "DefaultStatus",
+            "$ref": "#/components/schemas/IdName"
+          },
+          "description":{
+            "type": "string"
+          },
+          "enabled_standard_fields":{
+            "type": "array",
+            "items":{
+              "type": "string"
+            }
+          }
+        }
+      },
+      "TrackerList":{
+        "type": "object",
+        "required": [
+          "trackers"
+        ],
+        "properties": {
+          "trackers": {
+            "title": "Trackers",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tracker"
+            }
+          }
+        }        
+      },
+      "Search":{
+        "type": "object",
+        "properties": {
+          "id":{
+            "type": "integer"
+          },
+          "title":{
+            "type": "string"
+          },
+          "type":{
+            "type": "string"
+          },
+          "url":{
+            "type": "string"
+          },
+          "description":{
+            "type": "string"
+          },
+          "datetime":{
+            "type": "string",
+            "format": "date-time"
+          }
+        }        
+      },
+      "Upload":{
+        "type":"object",
+        "required":[
+          "token"
+        ],
+        "properties": {
+          "token":{
+            "type": "string"
+          },
+          "filename":{
+            "type": "string"
+          },
+          "description":{
+            "type": "string"
+          },
+          "content_type":{
+            "type": "string"
+          }
+        }        
+      },
+      "UploadList":{
+        "type": "array",
+        "items":{
+          "$ref": "#/components/schemas/Upload"
+        }
+      },
+      "WatcherAdd":{
+        "required": [
+          "user_id"
+        ],
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "integer",
+            "description": "id of the user to add as a watcher"
+          },
+          "name":{
+            "type": "string",
+            "description": "empty for rtti"
+          }
+        }        
+      }
+    },
+    "parameters": {
+      "format": {
+        "name": "format",
+        "in": "path",
+        "description": "json or xml",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "default": "json",
+          "enum": [
+            "json",
+            "xml",
+            "csv"
+          ]
+        }
+      },
+      "type":{
+        "name": "type",
+        "in": "path",
+        "description": "Enumeration Type issue_priorities,time_entry_activities,document_categories",        
+        "required": true,
+        "schema": {
+          "type": "string",
+          "default": "issue_priorities",
+          "enum": [
+            "issue_priorities",
+            "time_entry_activities",
+            "document_categories"
+          ]
+        }        
+      },
+      "membership_id":{
+        "name": "membership_id",
+        "in": "path",
+        "description": "The user identifier number",
+        "required": true,
+        "schema": {
+          "type": "integer"
+        }                        
+      },
+      "relation_id":{
+        "name": "relation_id",
+        "in": "path",
+        "description": "The user identifier number",
+        "required": true,
+        "schema": {
+          "type": "integer"
+        }                
+      },
+      "version_id":{
+        "name": "version_id",
+        "in": "path",
+        "description": "The user identifier number",
+        "required": true,
+        "schema": {
+          "type": "integer"
+        }        
+      },
+      "role_id": {
+        "name": "role_id",
+        "in": "path",
+        "description": "The user identifier number",
+        "required": true,
+        "schema": {
+          "type": "integer"
+        }
+      },
+      "issue_category_id":{
+        "name": "issue_category_id",
+        "in": "path",
+        "description": "The user identifier number",
+        "required": true,
+        "schema": {
+          "type": "integer"
+        }        
+      },
+      "issue_id": {
+        "name": "issue_id",
+        "in": "path",
+        "description": "The user identifier number",
+        "required": true,
+        "schema": {
+          "type": "integer"
+        }
+      },
+      "checklist_id": {
+        "name": "checklist_id",
+        "in": "path",
+        "description": "The user identifier number",
+        "required": true,
+        "schema": {
+          "type": "integer"
+        }
+      },      
+      "user_id": {
+        "name": "user_id",
+        "in": "path",
+        "description": "The user identifier number",
+        "required": true,
+        "schema": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string",
+              "enum": ["current"]
+            }
+          ]    
+        }
+      },
+      "project_id": {
+        "name": "project_id",
+        "in": "path",
+        "description": "The user identifier number",
+        "required": true,
+        "schema": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string"
+            }            
+          ]
+        }
+      },
+      "group_id": {
+        "name": "group_id",
+        "in": "path",
+        "description": "The user identifier number",
+        "required": true,
+        "schema": {
+          "type": "integer"
+        }
+      },
+      "journal_id": {
+        "name": "journal_id",
+        "in": "path",
+        "description": "The user identifier number",
+        "required": true,
+        "schema": {
+          "type": "integer"
+        }
+      },      
+      "limit_param":{
+        "name": "limit",
+        "in": "query",
+        "required": false,
+        "description": "number of issues per page (optional)",
+        "schema": {
+          "type": "integer"
+        }        
+      },
+      "offset_param":{
+        "name": "offset",
+        "in": "query",
+        "description": "the offset of the first object to retrieve",
+        "required": false,
+        "allowEmptyValue": true,
+        "schema": {
+          "type": "integer"
+        }        
+      },
+      "entry_id":{
+        "name": "entry_id",
+        "in": "path",
+        "description": "id of the entry to update",
+        "required": true,
+        "schema": {
+          "type": "integer"
+        }        
+      }
+    },
+    "responses": {
+      "default":{
+        "$ref": "#/components/responses/UnknownError"
+      },
+      "400": {
+        "$ref": "#/components/responses/bad-request"
+      },
+      "401": {
+        "$ref": "#/components/responses/unauthorized"
+      },
+      "403": {
+        "$ref": "#/components/responses/forbidden"
+      },
+      "404": {
+        "$ref": "#/components/responses/not-found"
+      },
+      "409": {
+        "$ref": "#/components/responses/conflict"
+      },
+      "429": {
+        "$ref": "#/components/responses/too-many-requests"
+      },
+      "500": {
+        "$ref": "#/components/responses/internal-server-error"
+      },
+      "conflict": {
+        "description": "Конфликт",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status_code": {
+                  "type": "number",
+                  "example": 409,
+                  "description": "Короткий идентификатор, соответствующий возвращаемому коду состояния HTTP."
+                },
+                "message": {
+                  "description": "Сообщение, предоставляющее дополнительную информацию об ошибке, в том числе сведения, помогающие устранить ее, когда это возможно.",
+                  "oneOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  ]
+                },
+                "error_code": {
+                  "type": "string",
+                  "description": "Краткое описание ошибки HTTP на основе статуса."
+                }
+              },
+              "required": [
+                "status_code",
+                "error_code"
+              ]
+            }
+          }
+        }
+      },
+      "CustomFieldsList":{
+        "description": "",
+        "content": {
+          "application/json":{
+            "schema":{
+              "$ref": "#/components/schemas/CustomFieldsList"
+            }
+          }
+        }        
+      },
+      "AccountShow":{
+        "description": "Returns the details of your account.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/AccountShow"
+            }
+          }
+        }        
+      },
+      "bad-request": {
+        "description": "Некорректный запрос",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status_code": {
+                  "type": "number",
+                  "description": "Короткий идентификатор, соответствующий возвращаемому коду состояния HTTP.",
+                  "example": 400
+                },
+                "message": {
+                  "example": "Value must be a number conforming to the specified constraints",
+                  "description": "Сообщение, предоставляющее дополнительную информацию об ошибке, в том числе сведения, помогающие устранить ее, когда это возможно.",
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": " "
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  ]
+                },
+                "error_code": {
+                  "type": "string",
+                  "example": "bad_request",
+                  "description": "Краткое описание ошибки HTTP на основе статуса."
+                }
+              },
+              "required": [
+                "status_code",
+                "error_code"
+              ]
+            }
+          }
+        }
+      },
+      "UnknownError":{
+        "description": "Неизвестная ошибка пр работе с API.",
+        "content":{
+          "application/json":{
+            "schema":{
+              "$ref": "#/components/schemas/UnknownError"
+            }  
+          }    
+        }                
+      },
+      "unauthorized": {
+        "description": "Не авторизован",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/NotAuthorized"
+            }
+          }
+        }
+      },
+      "forbidden": {
+        "description": "Запрещено",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Forbidden"
+            }
+          }
+        }
+      },
+      "IssueCategoryList":{
+        "description": "",
+        "content": {
+          "application/json":{
+            "schema":{
+              "$ref": "#/components/schemas/IssueCategoryList"
+            }
+          }              
+        }                
+      },
+      "IssueCategoryShow":{
+        "description": "",
+        "content": {
+          "application/json":{
+            "schema":{
+              "$ref": "#/components/schemas/IssueCategoryShow"
+            }
+          }
+        }      
+      },
+      "IssueCategoryUpdate":{
+        "description": "",
+        "content": {
+          "application/json":{
+            "schema":{
+              "$ref": "#/components/schemas/IssueCategoryUpdate"
+            }
+          }
+        }              
+      },
+      "MemberShipShow":{
+        "description": "",
+        "content": {
+          "application/json":{
+            "schema":{
+              "$ref": "#/components/schemas/MemberShipShow"
+            }
+          }              
+        }                
+      },
+      "MemberShipList":{
+        "description": "",
+        "content": {
+          "application/json":{
+            "schema":{
+              "$ref": "#/components/schemas/MemberShipList"
+            }
+          }              
+        }        
+      },
+      "not-found": {
+        "description": "Не найдено",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ResNotFound"
+            }
+          }
+        }
+      },
+      "too-many-requests": {
+        "description": "Слишком много запросов",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status_code": {
+                  "type": "number",
+                  "example": 429,
+                  "description": "Короткий идентификатор, соответствующий возвращаемому коду состояния HTTP."
+                },
+                "message": {
+                  "description": "Сообщение, предоставляющее дополнительную информацию об ошибке, в том числе сведения, помогающие устранить ее, когда это возможно.",
+                  "oneOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  ],
+                  "example": "Too many requests"
+                },
+                "error_code": {
+                  "type": "string",
+                  "example": "too_many_requests",
+                  "description": "Краткое описание ошибки HTTP на основе статуса."
+                }
+              },
+              "required": [
+                "status_code",
+                "error_code"
+              ]
+            }
+          }
+        }
+      },
+      "internal-server-error": {
+        "description": "Внутренняя ошибка сервера",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status_code": {
+                  "type": "number",
+                  "example": 500,
+                  "description": "Короткий идентификатор, соответствующий возвращаемому коду состояния HTTP."
+                },
+                "message": {
+                  "description": "Сообщение, предоставляющее дополнительную информацию об ошибке, в том числе сведения, помогающие устранить ее, когда это возможно.",
+                  "oneOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  ],
+                  "example": "Internal server error"
+                },
+                "error_code": {
+                  "type": "string",
+                  "example": "internal_server_error",
+                  "description": "Краткое описание ошибки HTTP на основе статуса."
+                }
+              },
+              "required": [
+                "status_code",
+                "error_code"
+              ]
+            }
+          }
+        }
+      },
+      "ValidationError": {
+        "description": "Unprocessable Entity",
+        "content": {
+          "application/json":{
+            "schema":{
+              "$ref": "#/components/schemas/ValidationError"
+            }
+          }
+        }      
+      },
+      "GroupShow":{
+        "description": "Success",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/GroupShow"
+            }
+          }
+        }        
+      },
+      "GroupList":{
+        "description": "Success",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/GroupList"
+            }
+          }
+        }        
+      },
+      "EnumList":{
+        "description": "Success",
+        "content": {
+          "application/json":{
+            "schema": {
+              "$ref": "#/components/schemas/EnumList"
+            }                
+          }
+        }        
+      },
+      "IssueList":{
+        "description": "Success",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/IssueList"
+            }
+          },
+          "text/csv":{
+            "schema":{
+              "type": "array",
+              "items":{
+                "type": "string"
+              }
+            }
+          }
+        }        
+      },
+      "IssueShow":{
+        "description": "Success",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/IssueShow"
+            }
+          }
+        }        
+      },
+      "UserShow":{
+        "description": "Success",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/UserShow"
+            }
+          }
+        }        
+      },
+      "UserList":{
+        "description": "Success",
+        "content": {
+          "application/json":{
+            "schema": {
+              "$ref": "#/components/schemas/UserList"
+            }                
+          }
+        }        
+      },
+      "ProjectShow":{
+        "description": "Success",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ProjectShow"
+            }
+          }              
+        }        
+      },
+      "ProjectList":{
+        "description": "Success",
+        "content": {
+          "application/json": {
+            "schema": {
+                "$ref": "#/components/schemas/ProjectList"
+            }
+          }
+        }
+      },        
+      "CheckListList":{
+        "description": "Success",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/CheckListList"
+            }
+          }
+        }        
+      },
+      "TimeShow":{
+        "description": "OK",
+        "content": {
+          "application/json":{
+            "schema": {
+              "$ref": "#/components/schemas/TimeShow"
+            }
+          }
+        }        
+      },
+      "TimeList":{
+        "description": "A TimeEntry",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/TimeList"
+            }
+          }
+        }        
+      },
+      "TrackerList":{
+        "description": "Success",
+        "content": {
+          "application/json":{
+            "schema": {
+              "$ref": "#/components/schemas/TrackerList"
+            }                
+          }
+        }        
+      },
+      "SearchList":{
+        "description": "Success",
+        "content": {
+          "application/json":{
+            "schema":{
+              "type": "object",
+              "required": ["results"],
+              "properties": {
+                "results":{
+                  "type": "array",
+                  "items":{
+                    "$ref": "#/components/schemas/Search"
+                  }
+                },
+                "total_count":{
+                  "type": "integer"
+                },
+                "offset":{
+                  "type": "integer"
+                },
+                "limit":{
+                  "type": "integer"
+                }
+              }                  
+            }
+          }
+        }        
+      },
+      "StatusesList":{
+        "description": "Success",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/IssueStatusesList"
+            }
+          }              
+        }        
+      },
+      "VersionShow":{
+        "description" : "",
+        "content": {
+          "application/json":{
+            "schema":{
+              "$ref": "#/components/schemas/VersionShow"
+            }    
+          }
+        }                      
+      },
+      "VersionList":{
+        "description" : "",
+        "content": {
+          "application/json":{
+            "schema":{
+              "$ref": "#/components/schemas/VersionList"
+            }    
+          }
+        }                
+      },
+      "RoleShow":{
+        "description" : "",
+        "content": {
+          "application/json":{
+            "schema":{
+              "$ref": "#/components/schemas/RoleShow"
+            }    
+          }
+        }                
+      },
+      "RolesList":{
+        "description" : "",
+        "content": {
+          "application/json":{
+            "schema":{
+              "$ref": "#/components/schemas/RolesList"
+            }    
+          }
+        }        
+      },
+      "RelationShow":{
+        "description" : "",
+        "content": {
+          "application/json":{
+            "schema":{
+              "$ref": "#/components/schemas/RelationShow"
+            }    
+          }
+        }                        
+      },
+      "RelationList":{
+        "description" : "",
+        "content": {
+          "application/json":{
+            "schema":{
+              "$ref": "#/components/schemas/RelationList"
+            }    
+          }
+        }        
+      },
+      "QueriesList":{
+        "description": "Success",
+        "content": {
+          "application/json":{
+            "schema":{
+              "$ref": "#/components/schemas/QueriesList"
+            }
+          }
+        }        
+      }
+    },      
+    "securitySchemes": {
+      "api_key": {
+        "type": "apiKey",
+        "name": "X-Redmine-API-Key",
+        "in": "header"
+      },
+      "BasicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    }
+  }
+}
